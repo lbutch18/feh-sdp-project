@@ -11,18 +11,56 @@ void drawStatistics();
 void drawInstructions();
 void drawCredits();
 void introScreen();
+void nextGameFrame(bool reset);
+
+class Player {
+
+};
+
+class Coin {
+    private:
+        int lane = 1; // Default lane
+        int x_pos, y_pos;
+        int COIN_RADIUS = 10;
+    public:
+    // Constructor - lane 1 is left, 2 is center, 3 is left
+    Coin(int lane){
+        if (lane == 1){
+            x_pos = SCREEN_WIDTH / 4 + COIN_RADIUS + COIN_RADIUS/2;
+        }
+        else if (lane == 2){
+            x_pos = SCREEN_WIDTH / 2;
+        } 
+        else if(lane == 3){
+            x_pos = 3 * SCREEN_WIDTH / 4 - COIN_RADIUS - COIN_RADIUS/2;
+        }
+        y_pos = 0; // Start at top of screen
+
+        // Until we get graphics, represent coin as a circle
+        LCD.SetFontColor(YELLOW);
+        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS);
+        LCD.SetFontColor(WHITE);
+    }
+    void nextFrame(){
+        // Move coin down the screen
+        LCD.SetFontColor(BLACK);
+        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Erase old position
+        y_pos += 5; // Move down 5 pixels
+        LCD.SetFontColor(YELLOW);
+        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Draw at new position
+        LCD.SetFontColor(WHITE);
+    }
+    
+};
+
+class Obstacle {
+
+};
 
 int main()
 {
     drawMenu();
-    while (1) {
-        
-        LCD.Update();
-         //Never end
-    }
-    return 0;
 }
-//hi
 
 void drawMenu() {
     LCD.Clear();
@@ -42,6 +80,7 @@ void drawMenu() {
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool boxTouched = false;
+
     while (!boxTouched){
         while (!LCD.Touch(&x_pos, &y_pos));
         while (LCD.Touch(&x_dummy, &y_dummy));
@@ -68,25 +107,81 @@ void drawMenu() {
 void drawPlay()
 {
     LCD.Clear();
-    LCD.DrawRectangle(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT - 100, 100, 50);
-    LCD.WriteAt("Back", SCREEN_WIDTH / 2 - 25, 140);
+
+    // Draw back button
+    LCD.DrawRectangle(5, 5, 20, 20);
+    LCD.WriteAt("<", 5, 5);
+
+    // Draw lanes - TODO: Replace with dashed lines
+    LCD.DrawLine(SCREEN_WIDTH / 5, 0, SCREEN_WIDTH / 5, SCREEN_HEIGHT);
+    LCD.DrawLine(SCREEN_WIDTH * 2 / 5, 0, SCREEN_WIDTH * 2 / 5, SCREEN_HEIGHT);
+    LCD.DrawLine(SCREEN_WIDTH * 3 / 5, 0, SCREEN_WIDTH * 3 / 5, SCREEN_HEIGHT);
+    LCD.DrawLine(SCREEN_WIDTH * 4 / 5, 0, SCREEN_WIDTH * 4 / 5, SCREEN_HEIGHT);
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
-   
+    bool reset = true; // To reset game state on first frame after entering from menu
     while(!exit)
     {
-        while (!LCD.Touch(&x_pos, &y_pos));
-        while (LCD.Touch(&x_dummy, &y_dummy));
-        while (LCD.Touch(&x_dummy, &y_dummy));
-        while (LCD.Touch(&x_dummy, &y_dummy));
-        if(x_pos > SCREEN_WIDTH / 2 - 50  && x_pos < SCREEN_WIDTH /2 + 50  && y_pos > SCREEN_HEIGHT - 100  && y_pos < SCREEN_HEIGHT - 50){
+        // Run game frames until back button is pressed
+        while (!LCD.Touch(&x_pos, &y_pos)){
+            nextGameFrame(reset);
+            Sleep(50); // Frame rate
+            reset = false;
+        }
+        while (LCD.Touch(&x_dummy, &y_dummy)){
+            nextGameFrame(reset);
+            Sleep(50); // Frame rate
+            reset = false;
+        }
+        
+        if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
             exit = true;
         }
     }
     LCD.Clear();
     drawMenu();
 }
+
+
+void introScreen()
+{
+    LCD.Clear();
+    FEHImage first;
+    first.Open("Evil Money Guy Updated.png");
+    first.Draw(0,0);
+
+    Sleep(4.0);
+    FEHImage second;
+    second.Open("Planning Guy.png");
+    second.Draw(0,0);
+
+    Sleep(4.0);
+    FEHImage third;
+    third.Open("Heist Happening.png");
+    third.Draw(0,0);
+
+    Sleep(4.0);
+    FEHImage fourth;
+    fourth.Open("Final Intro Screen.png");
+    fourth.Draw(0,0);
+
+}
+
+void nextGameFrame(bool reset){
+    static Coin coin1(1);
+    static Coin coin2(2);
+    static Coin coin3(3);
+    if (reset) {
+        coin1 = Coin(1);
+        coin2 = Coin(2);
+        coin3 = Coin(3);
+    }
+    coin1.nextFrame();
+    coin2.nextFrame();
+    coin3.nextFrame();
+}
+
 void drawStatistics()
 {
     LCD.Clear();
@@ -128,7 +223,6 @@ void drawInstructions()
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
-    
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
@@ -172,33 +266,3 @@ void drawCredits()
     LCD.Clear();
     drawMenu();
 }
-
-void introScreen()
-{
-    LCD.Clear();
-    FEHImage first;
-    first.Open("Evil Money Guy Updated.png");
-    first.Draw(0,0);
-
-    Sleep(4.0);
-    FEHImage second;
-    second.Open("Planning Guy.png");
-    second.Draw(0,0);
-
-    Sleep(4.0);
-    FEHImage third;
-    third.Open("Heist Happening.png");
-    third.Draw(0,0);
-
-    Sleep(4.0);
-    FEHImage fourth;
-    fourth.Open("Final Intro Screen.png");
-    fourth.Draw(0,0);
-
-}
-
-
-
-    
-
-
