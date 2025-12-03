@@ -23,7 +23,7 @@ class Coin {
     private:
         int lane = 1; // Default lane
         int x_pos, y_pos;
-        int COIN_RADIUS = 10;
+        #define COIN_RADIUS 10
     public:
     // Constructor - lane 1 is left, 2 is center, 3 is left
     Coin(int lane){
@@ -52,10 +52,39 @@ class Coin {
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Draw at new position
         LCD.SetFontColor(WHITE);
     }
-    
 };
 
-class Obstacle {
+class Car {
+    private:
+        int lane;
+        int x_pos, y_pos;
+        FEHImage carSprite;
+    public:
+    Car(int lane){
+        if (lane == 1){
+            x_pos = SCREEN_WIDTH / 4 + 4;
+        } else if (lane == 2){
+            x_pos = SCREEN_WIDTH / 2 - 12;
+        } else if (lane == 3){
+            x_pos = 3 * SCREEN_WIDTH / 4 - 26;
+        }
+        y_pos = 0;
+
+        carSprite.Open("Car.png");
+        carSprite.Draw(x_pos, y_pos);
+    }
+    void nextFrame(){
+        // Move car down the screen
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(x_pos, y_pos, 30 , 60); // Erase old car
+        LCD.SetFontColor(WHITE);
+
+        y_pos += 5;
+        carSprite.Draw(x_pos, y_pos);
+    }
+};
+
+class Bus {
 
 };
 
@@ -145,12 +174,12 @@ void drawPlay()
         // Run game frames until back button is pressed
         while (!LCD.Touch(&x_pos, &y_pos)){
             nextGameFrame(reset);
-            Sleep(50); // Frame rate
+            Sleep(100); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         while (LCD.Touch(&x_dummy, &y_dummy)){
             nextGameFrame(reset);
-            Sleep(50); // Frame rate
+            Sleep(100); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         
@@ -188,17 +217,35 @@ void introScreen()
 }
 
 void nextGameFrame(bool reset){
+    // All objects should be declared static so their locations/states are maintained
+    /* This is for TESTING right now, eventually will need to randomly generate coins and cars, check collisions, delete off-screen objects, etc.*/
+    // Reminder, the object constructors take in lane number (1 = left, 2 = center, 3 = right)
     static Coin coin1(1);
     static Coin coin2(2);
     static Coin coin3(3);
+
+    static Car car1(1);
+    static Car car2(2);
+    static Car car3(3);
+    // reset game when coming back from menu
     if (reset) {
         coin1 = Coin(1);
         coin2 = Coin(2);
         coin3 = Coin(3);
+        car1 = Car(1);
+        car2 = Car(2);
+        car3 = Car(3);
     }
+
+    // Move all objects down/next animation frame
     coin1.nextFrame();
     coin2.nextFrame();
     coin3.nextFrame();
+    car1.nextFrame();
+    car2.nextFrame();
+    car3.nextFrame();
+
+    // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
 }
 
 void drawStatistics()
@@ -307,11 +354,4 @@ void drawCredits()
     }
     LCD.Clear();
     drawMenu();
-}
-
-
-
-void moveRight()
-{
-    
 }
