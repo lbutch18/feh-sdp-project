@@ -16,6 +16,88 @@ void nextGameFrame(bool reset);
 void userInput();
 
 class Player {
+    private:
+        int lane;
+        int x_pos, y_pos;
+        int PLAYER_RADIUS = 10;
+        FEHImage image;
+    public:
+    Player(int inputLane)
+    {
+        if (inputLane == 1){
+            lane = 1;
+            x_pos = 71;
+            image.Open("player.png");
+            image.Draw(71, 190);
+        }
+        else if (inputLane == 2){
+            lane = 2;
+            x_pos =  135;
+            image.Open("player.png");
+            image.Draw(135, 190);
+        } 
+        else if(inputLane == 3){
+            lane = 3;
+            x_pos = 199;
+            image.Open("player.png");
+            image.Draw(199, 190);
+        }
+        y_pos = 300; // Start at bottom of screen
+    }
+    //X Position will be top left corner of picture to draw;
+    void moveRight()
+    {
+        LCD.SetFontColor(BLACK);
+      
+        if(lane == 2)
+        {
+            lane = lane + 1;
+            LCD.DrawRectangle(135, 190, 50, 50);
+            LCD.FillRectangle(135, 190, 50, 50);
+            x_pos = 199;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(x_pos, 190);
+        }
+        else if(lane == 1)
+        {
+            lane = lane + 1;
+            LCD.DrawRectangle(71, 190, 50, 50);
+            LCD.FillRectangle(71, 190, 50, 50);
+            x_pos = 135;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(135, 190);
+            
+        }
+    }
+    void moveLeft()
+    {
+        LCD.SetFontColor(WHITE);
+        if(lane == 2)
+        {
+            lane = lane - 1;
+            x_pos = 71;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(x_pos, 190);
+            LCD.DrawRectangle(135, 190, 50, 50);
+            LCD.FillRectangle(135, 190, 50, 50);
+            
+        }
+        else if(lane == 3)
+        {
+            lane = lane - 1;
+            x_pos = 135;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(x_pos, 190);
+            LCD.DrawRectangle(199, 190, 50, 50);
+            LCD.FillRectangle(199, 190, 50, 50);
+        }
+    }
+
+    
 
 };
 
@@ -137,9 +219,11 @@ void drawPlay()
     LCD.DrawLine(SCREEN_WIDTH * 3 / 5, 0, SCREEN_WIDTH * 3 / 5, SCREEN_HEIGHT);
     LCD.DrawLine(SCREEN_WIDTH * 4 / 5, 0, SCREEN_WIDTH * 4 / 5, SCREEN_HEIGHT);
 
+    
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     bool reset = true; // To reset game state on first frame after entering from menu
+  
     while(!exit)
     {
         // Run game frames until back button is pressed
@@ -283,16 +367,18 @@ void drawCredits()
     LCD.Clear();
     //Fix this - tested intro screens
     
-    
-    LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
-    LCD.SetFontScale(0.5);
-    LCD.DrawRectangle(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT - 100, 100, 50);
-    LCD.SetFontScale(1.0);
-    LCD.WriteAt("Back", SCREEN_WIDTH / 2 - 25, 140);    
-    LCD.SetFontScale(1.0);
+    //LCD.SetFontScale(0.5);
+    //LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
     
     
 
+    
+      
+    LCD.SetFontScale(1.0);
+    
+    
+    LCD.DrawRectangle(5, 5, 20, 20);
+    LCD.WriteAt("<", 5, 5);
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     while(!exit)
@@ -311,7 +397,3 @@ void drawCredits()
 
 
 
-void moveRight()
-{
-    
-}
