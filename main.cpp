@@ -1,4 +1,6 @@
-#include "FEHLCD.h"
+#include <FEHLCD.h>
+#include <FEHImages.h>
+#include <FEHUtility.h>
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
@@ -8,6 +10,7 @@ void drawPlay();
 void drawStatistics();
 void drawInstructions();
 void drawCredits();
+void introScreen();
 
 int main()
 {
@@ -65,12 +68,12 @@ void drawMenu() {
 void drawPlay()
 {
     LCD.Clear();
-    LCD.WriteLine("Play game here");
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT - 100, 100, 50);
     LCD.WriteAt("Back", SCREEN_WIDTH / 2 - 25, 140);
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
+   
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
@@ -125,6 +128,7 @@ void drawInstructions()
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
+    
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
@@ -168,6 +172,32 @@ void drawCredits()
     LCD.Clear();
     drawMenu();
 }
+
+void introScreen()
+{
+    LCD.Clear();
+    FEHImage first;
+    first.Open("Evil Money Guy Updated.png");
+    first.Draw(0,0);
+
+    Sleep(4.0);
+    FEHImage second;
+    second.Open("Planning Guy.png");
+    second.Draw(0,0);
+
+    Sleep(4.0);
+    FEHImage third;
+    third.Open("Heist Happening.png");
+    third.Draw(0,0);
+
+    Sleep(4.0);
+    FEHImage fourth;
+    fourth.Open("Final Intro Screen.png");
+    fourth.Draw(0,0);
+
+}
+
+
 
     
 
