@@ -16,6 +16,88 @@ void nextGameFrame(bool reset);
 void userInput();
 
 class Player {
+    private:
+        int lane;
+        int x_pos, y_pos;
+        int PLAYER_RADIUS = 10;
+        FEHImage image;
+    public:
+    Player(int inputLane)
+    {
+        if (inputLane == 1){
+            lane = 1;
+            x_pos = 71;
+            image.Open("player.png");
+            image.Draw(71, 190);
+        }
+        else if (inputLane == 2){
+            lane = 2;
+            x_pos =  135;
+            image.Open("player.png");
+            image.Draw(135, 190);
+        } 
+        else if(inputLane == 3){
+            lane = 3;
+            x_pos = 199;
+            image.Open("player.png");
+            image.Draw(199, 190);
+        }
+        y_pos = 300; // Start at bottom of screen
+    }
+    //X Position will be top left corner of picture to draw;
+    void moveRight()
+    {
+        LCD.SetFontColor(BLACK);
+      
+        if(lane == 2)
+        {
+            lane = lane + 1;
+            LCD.DrawRectangle(135, 190, 50, 50);
+            LCD.FillRectangle(135, 190, 50, 50);
+            x_pos = 199;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(x_pos, 190);
+        }
+        else if(lane == 1)
+        {
+            lane = lane + 1;
+            LCD.DrawRectangle(71, 190, 50, 50);
+            LCD.FillRectangle(71, 190, 50, 50);
+            x_pos = 135;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(135, 190);
+            
+        }
+    }
+    void moveLeft()
+    {
+        LCD.SetFontColor(WHITE);
+        if(lane == 2)
+        {
+            lane = lane - 1;
+            x_pos = 71;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(x_pos, 190);
+            LCD.DrawRectangle(135, 190, 50, 50);
+            LCD.FillRectangle(135, 190, 50, 50);
+            
+        }
+        else if(lane == 3)
+        {
+            lane = lane - 1;
+            x_pos = 135;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(x_pos, 190);
+            LCD.DrawRectangle(199, 190, 50, 50);
+            LCD.FillRectangle(199, 190, 50, 50);
+        }
+    }
+
+    
 
 };
 
@@ -23,7 +105,7 @@ class Coin {
     private:
         int lane = 1; // Default lane
         int x_pos, y_pos;
-        int COIN_RADIUS = 10;
+        #define COIN_RADIUS 10
     public:
     // Constructor - lane 1 is left, 2 is center, 3 is left
     Coin(int lane){
@@ -52,10 +134,39 @@ class Coin {
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Draw at new position
         LCD.SetFontColor(WHITE);
     }
-    
 };
 
-class Obstacle {
+class Car {
+    private:
+        int lane;
+        int x_pos, y_pos;
+        FEHImage carSprite;
+    public:
+    Car(int lane){
+        if (lane == 1){
+            x_pos = SCREEN_WIDTH / 4 + 4;
+        } else if (lane == 2){
+            x_pos = SCREEN_WIDTH / 2 - 12;
+        } else if (lane == 3){
+            x_pos = 3 * SCREEN_WIDTH / 4 - 26;
+        }
+        y_pos = 0;
+
+        carSprite.Open("Car.png");
+        carSprite.Draw(x_pos, y_pos);
+    }
+    void nextFrame(){
+        // Move car down the screen
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(x_pos, y_pos, 30 , 60); // Erase old car
+        LCD.SetFontColor(WHITE);
+
+        y_pos += 5;
+        carSprite.Draw(x_pos, y_pos);
+    }
+};
+
+class Bus {
 
 };
 
@@ -137,20 +248,22 @@ void drawPlay()
     LCD.DrawLine(SCREEN_WIDTH * 3 / 5, 0, SCREEN_WIDTH * 3 / 5, SCREEN_HEIGHT);
     LCD.DrawLine(SCREEN_WIDTH * 4 / 5, 0, SCREEN_WIDTH * 4 / 5, SCREEN_HEIGHT);
 
+    
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     bool reset = true; // To reset game state on first frame after entering from menu
+  
     while(!exit)
     {
         // Run game frames until back button is pressed
         while (!LCD.Touch(&x_pos, &y_pos)){
             nextGameFrame(reset);
-            Sleep(50); // Frame rate
+            Sleep(100); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         while (LCD.Touch(&x_dummy, &y_dummy)){
             nextGameFrame(reset);
-            Sleep(50); // Frame rate
+            Sleep(100); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         
@@ -189,17 +302,32 @@ void introScreen()
 
 void nextGameFrame(bool reset){
     // All objects should be declared static so their locations/states are maintained
+    /* This is for TESTING right now, eventually will need to randomly generate coins and cars, check collisions, delete off-screen objects, etc.*/
+    // Reminder, the object constructors take in lane number (1 = left, 2 = center, 3 = right)
     static Coin coin1(1);
     static Coin coin2(2);
     static Coin coin3(3);
+
+    static Car car1(1);
+    static Car car2(2);
+    static Car car3(3);
+    // reset game when coming back from menu
     if (reset) {
         coin1 = Coin(1);
         coin2 = Coin(2);
         coin3 = Coin(3);
+        car1 = Car(1);
+        car2 = Car(2);
+        car3 = Car(3);
     }
+
+    // Move all objects down/next animation frame
     coin1.nextFrame();
     coin2.nextFrame();
     coin3.nextFrame();
+    car1.nextFrame();
+    car2.nextFrame();
+    car3.nextFrame();
 
     // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
 }
@@ -286,16 +414,18 @@ void drawCredits()
     LCD.Clear();
     //Fix this - tested intro screens
     
-    
-    LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
-    LCD.SetFontScale(0.5);
-    LCD.DrawRectangle(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT - 100, 100, 50);
-    LCD.SetFontScale(1.0);
-    LCD.WriteAt("Back", SCREEN_WIDTH / 2 - 25, 140);    
-    LCD.SetFontScale(1.0);
+    //LCD.SetFontScale(0.5);
+    //LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
     
     
 
+    
+      
+    LCD.SetFontScale(1.0);
+    
+    
+    LCD.DrawRectangle(5, 5, 20, 20);
+    LCD.WriteAt("<", 5, 5);
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     while(!exit)
@@ -310,11 +440,4 @@ void drawCredits()
     }
     LCD.Clear();
     drawMenu();
-}
-
-
-
-void moveRight()
-{
-    
 }
