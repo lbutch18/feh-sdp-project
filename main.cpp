@@ -1,6 +1,7 @@
 #include <FEHLCD.h>
 #include <FEHImages.h>
 #include <FEHUtility.h>
+#include <FEHKeyboard.h>
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
@@ -12,6 +13,7 @@ void drawInstructions();
 void drawCredits();
 void introScreen();
 void nextGameFrame(bool reset);
+void userInput();
 
 class Player {
 
@@ -66,15 +68,32 @@ void drawMenu() {
     LCD.Clear();
     int boxWidth = SCREEN_WIDTH / 1.5;
     int boxHeight = SCREEN_HEIGHT / 8;
+    FEHImage menu;
+    menu.Open("Menu Screen.png");
+    menu.Draw(0,0);
     
+    LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 50, boxWidth, boxHeight); // Play Button
-    LCD.WriteAt("Play", SCREEN_WIDTH / 2 - boxWidth / 4, 50 + 5);
+    LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 50, boxWidth, boxHeight);\
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt("Play", 130, 50 + 5);
+    LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 100, boxWidth, boxHeight); // Instructions
-    LCD.WriteAt("Instructions", SCREEN_WIDTH / 2 - boxWidth / 4, 100 + 5);
+    LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 100, boxWidth, boxHeight);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt("Instructions", 100, 100 + 5);
+    LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 150, boxWidth, boxHeight); // Statistics
+     LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 150, boxWidth, boxHeight);
+    LCD.SetFontColor(WHITE);
     LCD.WriteAt("Statistics", SCREEN_WIDTH / 2 - boxWidth / 4, 150 + 5);
+    LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 200, boxWidth, boxHeight); // Credits
-    LCD.WriteAt("Credits", SCREEN_WIDTH / 2 - boxWidth / 4, 200 + 5);
+     LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 200, boxWidth, boxHeight);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt("Credits", 120, 200 + 5);
+
+    
     
     LCD.Update();
 
@@ -148,22 +167,22 @@ void introScreen()
 {
     LCD.Clear();
     FEHImage first;
-    first.Open("Evil Money Guy Updated.png");
+    first.Open("Evil Money Guy Updated2.png");
     first.Draw(0,0);
 
-    Sleep(4.0);
+    Sleep(2.5);
     FEHImage second;
-    second.Open("Planning Guy.png");
+    second.Open("Planning Guy Updated.png");
     second.Draw(0,0);
 
-    Sleep(4.0);
+    Sleep(2.5);
     FEHImage third;
-    third.Open("Heist Happening.png");
+    third.Open("Heist Happening Updated 1.png");
     third.Draw(0,0);
 
-    Sleep(4.0);
+    Sleep(2.5);
     FEHImage fourth;
-    fourth.Open("Final Intro Screen.png");
+    fourth.Open("Final Intro Screen Updated.png");
     fourth.Draw(0,0);
 
 }
@@ -188,24 +207,38 @@ void nextGameFrame(bool reset){
 void drawStatistics()
 {
     LCD.Clear();
-    LCD.WriteLine("Coins Collected: 19");
-    LCD.WriteLine("Distance traveled: 0 m");
-    LCD.WriteLine("Questions Answered Correctly: 0/0 (0%)");
     
-    LCD.DrawRectangle(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT - 100, 100, 50);
-    LCD.WriteAt("Back", SCREEN_WIDTH / 2 - 25, 140);
+    FEHImage menu;
+    menu.Open("Menu Screen.png");
+    menu.Draw(0,0);
+    //Print out stats
+    LCD.SetFontColor(BLACK);
+    LCD.DrawRectangle(10, 40, 300, 220);
+    LCD.FillRectangle(10, 40, 300, 220);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt( "Coins Collected: 19", 20, 50);
+    LCD.WriteAt("Distance traveled: 0 m", 20, 100);
+    LCD.WriteAt("Questions Answered", 20, 150);
+    LCD.WriteAt("Correctly: 0/0 (0%)", 20, 200);
+    
+    
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
+
+    //Draw back button
+    LCD.DrawRectangle(5, 5, 20, 20);
+    LCD.WriteAt("<", 5, 5);
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
         while (LCD.Touch(&x_dummy, &y_dummy));
         while (LCD.Touch(&x_dummy, &y_dummy));
         while (LCD.Touch(&x_dummy, &y_dummy));
-        if(x_pos > SCREEN_WIDTH / 2 - 50  && x_pos < SCREEN_WIDTH /2 + 50  && y_pos > SCREEN_HEIGHT - 100  && y_pos < SCREEN_HEIGHT - 50){
+        if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
             exit = true;
         }
+        
     }
     LCD.Clear();
     drawMenu();
@@ -222,19 +255,24 @@ void drawInstructions()
     LCD.WriteAt("to be a hero and in the middle of a heist!", 20, 150);     
     LCD.WriteAt("3. Use your keyboard to navigate around obstacles" , 20, 180);
 
-     LCD.WriteAt("Back", SCREEN_WIDTH / 2 - 25, 140);
+    
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
+
+    //Draw back button
+    LCD.DrawRectangle(5, 5, 20, 20);
+    LCD.WriteAt("<", 5, 5);
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
         while (LCD.Touch(&x_dummy, &y_dummy));
         while (LCD.Touch(&x_dummy, &y_dummy));
         while (LCD.Touch(&x_dummy, &y_dummy));
-        if(x_pos > SCREEN_WIDTH / 2 - 50  && x_pos < SCREEN_WIDTH /2 + 50  && y_pos > SCREEN_HEIGHT - 100  && y_pos < SCREEN_HEIGHT - 50){
+        if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
             exit = true;
         }
+        
     }
     LCD.Clear();
     LCD.SetFontScale(1.);
@@ -246,6 +284,8 @@ void drawInstructions()
 void drawCredits()
 {
     LCD.Clear();
+    //Fix this - tested intro screens
+    
     
     LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
     LCD.SetFontScale(0.5);
@@ -253,6 +293,8 @@ void drawCredits()
     LCD.SetFontScale(1.0);
     LCD.WriteAt("Back", SCREEN_WIDTH / 2 - 25, 140);    
     LCD.SetFontScale(1.0);
+    
+    
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
@@ -262,10 +304,17 @@ void drawCredits()
         while (LCD.Touch(&x_dummy, &y_dummy));
         while (LCD.Touch(&x_dummy, &y_dummy));
         while (LCD.Touch(&x_dummy, &y_dummy));
-        if(x_pos > SCREEN_WIDTH / 2 - 50  && x_pos < SCREEN_WIDTH /2 + 50  && y_pos > SCREEN_HEIGHT - 100  && y_pos < SCREEN_HEIGHT - 50){
+         if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
             exit = true;
         }
     }
     LCD.Clear();
     drawMenu();
+}
+
+
+
+void moveRight()
+{
+    
 }
