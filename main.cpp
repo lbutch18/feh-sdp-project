@@ -169,6 +169,7 @@ void introScreen()
 }
 
 void nextGameFrame(bool reset){
+    // All objects should be declared static so their locations/states are maintained
     static Coin coin1(1);
     static Coin coin2(2);
     static Coin coin3(3);
@@ -180,6 +181,8 @@ void nextGameFrame(bool reset){
     coin1.nextFrame();
     coin2.nextFrame();
     coin3.nextFrame();
+
+    // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
 }
 
 void drawStatistics()
