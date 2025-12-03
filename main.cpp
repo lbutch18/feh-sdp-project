@@ -19,6 +19,7 @@ int main()
     }
     return 0;
 }
+//hi
 
 void drawMenu() {
     LCD.Clear();
