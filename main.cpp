@@ -360,10 +360,10 @@ void nextGameFrame(bool reset){
     bus1.nextFrame();
     
     // Move when arrow keys pressed
-    if (Keyboard.isPressed(KEY_LEFT)){
-        player.moveLeft();
-    } else if (Keyboard.isPressed(KEY_RIGHT)){
-        player.moveRight();
+    if (Keyboard.isPressed(KEY_LEFT) || Keyboard.isPressed(KEY_UP)){
+        player.moveUp();
+    } else if (Keyboard.isPressed(KEY_RIGHT) || Keyboard.isPressed(KEY_DOWN)){
+        player.moveDown();
     }
 
     // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
