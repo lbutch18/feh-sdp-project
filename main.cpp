@@ -106,11 +106,6 @@ class Coin {
             y_pos = 3 * SCREEN_HEIGHT / 4 - COIN_RADIUS;
         }
         x_pos = SCREEN_WIDTH + COIN_RADIUS*2; // Start at right of screen
-
-        // Until we get graphics, represent coin as a circle
-        LCD.SetFontColor(YELLOW);
-        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS);
-        LCD.SetFontColor(WHITE);
     }
     void updatePosition(){
         // Move coin left across the screen
@@ -118,6 +113,7 @@ class Coin {
     }
     // Redraw coin each frame
     void draw(){
+        // Until we get graphics, represent coin as a circle
         LCD.SetFontColor(YELLOW);
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS);
         LCD.SetFontColor(WHITE);
@@ -145,7 +141,6 @@ class Car {
         x_pos = SCREEN_WIDTH;
 
         carSprite.Open("Car.png");
-        carSprite.Draw(x_pos, y_pos);
     }
     void updatePosition(){
         // Move car left across the screen
@@ -177,7 +172,6 @@ class Bus {
         x_pos = SCREEN_WIDTH;
 
         busSprite.Open("Bus.png");
-        busSprite.Draw(x_pos, y_pos);
     }
 
     void updatePosition(){
