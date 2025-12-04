@@ -106,13 +106,13 @@ class Coin {
     // Constructor - lane 1 is top, 2 is center, 3 is bottom
     Coin(int lane){
         if (lane == 1){
-            y_pos = SCREEN_WIDTH / 4 + COIN_RADIUS + COIN_RADIUS/2;
+            y_pos = SCREEN_HEIGHT / 4 + COIN_RADIUS;
         }
         else if (lane == 2){
-            y_pos = SCREEN_WIDTH / 2;
+            y_pos = SCREEN_HEIGHT / 2;
         } 
         else if(lane == 3){
-            y_pos = 3 * SCREEN_WIDTH / 4 - COIN_RADIUS - COIN_RADIUS/2;
+            y_pos = 3 * SCREEN_HEIGHT / 4 - COIN_RADIUS;
         }
         x_pos = 320; // Start at right of screen
 
