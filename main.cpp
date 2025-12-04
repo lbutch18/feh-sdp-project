@@ -250,21 +250,25 @@ void drawPlay()
 
 void introScreen()
 {
+    //First screen in storyline
     LCD.Clear();
     FEHImage first;
     first.Open("Evil Money Guy Updated2.png");
     first.Draw(0,0);
 
+    //Second screen in storyline
     Sleep(2.5);
     FEHImage second;
     second.Open("Planning Guy Updated.png");
     second.Draw(0,0);
 
+    //Third screen in storyline
     Sleep(2.5);
     FEHImage third;
     third.Open("Heist Happening Updated 1.png");
     third.Draw(0,0);
 
+    //Fourth screen in storyline
     Sleep(2.5);
     FEHImage fourth;
     fourth.Open("Final Intro Screen Updated.png");
@@ -311,6 +315,7 @@ void drawStatistics()
     //Draw back button
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
+    //Loop until button is pressed
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
@@ -323,11 +328,13 @@ void drawStatistics()
         
     }
     LCD.Clear();
+    //Return to menu screen
     drawMenu();
 }
 
 void drawInstructions()
 {
+    //Finish screen
     LCD.Clear();
     LCD.SetFontScale(0.5);
     LCD.WriteAt("Instructions", 20, 30);
