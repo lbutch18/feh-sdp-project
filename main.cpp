@@ -27,75 +27,75 @@ class Player {
     {
         if (inputLane == 1){
             lane = 1;
-            y_pos = 71;
-            image.Open("player.png");
-            image.Draw(130, 71);
+            y_pos = 50;
+            image.Open("player updated.png");
+            image.Draw(5, 50);
         }
         else if (inputLane == 2){
             lane = 2;
-            y_pos =  135;
-            image.Open("player.png");
-            image.Draw(130, 135);
+            y_pos =  98;
+            image.Open("player updated.png");
+            image.Draw(5, 98);
         } 
         else if(inputLane == 3){
             lane = 3;
-            y_pos = 199;
-            image.Open("player.png");
-            image.Draw(130, 199);
+            y_pos = 146;
+            image.Open("player updated.png");
+            image.Draw(5, 146);
         }
-        x_pos = 300; // Start at right of screen
+        x_pos = 5; // Start at left
     }
     //X Position will be top left corner of picture to draw;
     // Would be cool if we can make these smooth
-    void moveRight()
+    void moveUp()
     {
         LCD.SetFontColor(BLACK);
       
         if(lane == 2)
         {
-            lane = lane + 1;
-            LCD.DrawRectangle(130, 135, 50, 50);
-            LCD.FillRectangle(130, 135, 50, 50);
-            y_pos = 199;
+            lane = lane - 1;
+            LCD.DrawRectangle(5, 98, 45, 45);
+            LCD.FillRectangle(5, 98, 45, 45);
+            y_pos = 50;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(130, y_pos);
+            image.Draw(5, y_pos);
         }
-        else if(lane == 1)
+        else if(lane == 3)
         {
-            lane = lane + 1;
-            LCD.DrawRectangle(130, 71, 50, 50);
-            LCD.FillRectangle(130, 71, 50, 50);
-            y_pos = 135;
+            lane = lane - 1;
+            LCD.DrawRectangle(5, 146, 50, 50);
+            LCD.FillRectangle(5, 146, 50, 50);
+            x_pos = 98;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(130, 135);
+            image.Draw(5, y_pos);
             
         }
     }
-    void moveLeft()
+    void moveDown()
     {
         LCD.SetFontColor(BLACK);
         if(lane == 2)
         {
             lane = lane - 1;
-            y_pos = 71;
+            y_pos = 146;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(130, y_pos);
-            LCD.DrawRectangle(130, 135, 50, 50);
-            LCD.FillRectangle(130, 135, 50, 50);
+            image.Draw(5, y_pos);
+            LCD.DrawRectangle(5, 98, 50, 50);
+            LCD.FillRectangle(5, 98, 50, 50);
             
         }
-        else if(lane == 3)
+        else if(lane == 1)
         {
             lane = lane - 1;
-            y_pos = 135;
+            y_pos = 98;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(130, y_pos);
-            LCD.DrawRectangle(130, 199, 50, 50);
-            LCD.FillRectangle(130, 199, 50, 50);
+            image.Draw(5, y_pos);
+            LCD.DrawRectangle(5, 50, 50, 50);
+            LCD.FillRectangle(5, 50, 50, 50);
         }
     }
 };
