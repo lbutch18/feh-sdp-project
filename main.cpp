@@ -455,8 +455,8 @@ void drawCredits()
     
     //LCD.SetFontScale(0.5);
     //LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
+   
 
-        
 
     
       
