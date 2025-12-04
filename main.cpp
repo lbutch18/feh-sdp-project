@@ -27,23 +27,23 @@ class Player {
     {
         if (inputLane == 1){
             lane = 1;
-            x_pos = 71;
+            y_pos = 71;
             image.Open("player.png");
-            image.Draw(71, 190);
+            image.Draw(130, 71);
         }
         else if (inputLane == 2){
             lane = 2;
-            x_pos =  135;
+            y_pos =  135;
             image.Open("player.png");
-            image.Draw(135, 190);
+            image.Draw(130, 135);
         } 
         else if(inputLane == 3){
             lane = 3;
-            x_pos = 199;
+            y_pos = 199;
             image.Open("player.png");
-            image.Draw(199, 190);
+            image.Draw(130, 199);
         }
-        y_pos = 300; // Start at bottom of screen
+        x_pos = 300; // Start at right of screen
     }
     //X Position will be top left corner of picture to draw;
     // Would be cool if we can make these smooth
@@ -54,22 +54,22 @@ class Player {
         if(lane == 2)
         {
             lane = lane + 1;
-            LCD.DrawRectangle(135, 190, 50, 50);
-            LCD.FillRectangle(135, 190, 50, 50);
-            x_pos = 199;
+            LCD.DrawRectangle(130, 135, 50, 50);
+            LCD.FillRectangle(130, 135, 50, 50);
+            y_pos = 199;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(x_pos, 190);
+            image.Draw(130, y_pos);
         }
         else if(lane == 1)
         {
             lane = lane + 1;
-            LCD.DrawRectangle(71, 190, 50, 50);
-            LCD.FillRectangle(71, 190, 50, 50);
-            x_pos = 135;
+            LCD.DrawRectangle(130, 71, 50, 50);
+            LCD.FillRectangle(130, 71, 50, 50);
+            y_pos = 135;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(135, 190);
+            image.Draw(130, 135);
             
         }
     }
@@ -79,23 +79,23 @@ class Player {
         if(lane == 2)
         {
             lane = lane - 1;
-            x_pos = 71;
+            y_pos = 71;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(x_pos, 190);
-            LCD.DrawRectangle(135, 190, 50, 50);
-            LCD.FillRectangle(135, 190, 50, 50);
+            image.Draw(130, y_pos);
+            LCD.DrawRectangle(130, 135, 50, 50);
+            LCD.FillRectangle(130, 135, 50, 50);
             
         }
         else if(lane == 3)
         {
             lane = lane - 1;
-            x_pos = 135;
+            y_pos = 135;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(x_pos, 190);
-            LCD.DrawRectangle(199, 190, 50, 50);
-            LCD.FillRectangle(199, 190, 50, 50);
+            image.Draw(130, y_pos);
+            LCD.DrawRectangle(130, 199, 50, 50);
+            LCD.FillRectangle(130, 199, 50, 50);
         }
     }
 };
@@ -106,18 +106,18 @@ class Coin {
         int x_pos, y_pos;
         #define COIN_RADIUS 10
     public:
-    // Constructor - lane 1 is left, 2 is center, 3 is left
+    // Constructor - lane 1 is top, 2 is center, 3 is bottom
     Coin(int lane){
         if (lane == 1){
-            x_pos = SCREEN_WIDTH / 4 + COIN_RADIUS + COIN_RADIUS/2;
+            y_pos = SCREEN_WIDTH / 4 + COIN_RADIUS + COIN_RADIUS/2;
         }
         else if (lane == 2){
-            x_pos = SCREEN_WIDTH / 2;
+            y_pos = SCREEN_WIDTH / 2;
         } 
         else if(lane == 3){
-            x_pos = 3 * SCREEN_WIDTH / 4 - COIN_RADIUS - COIN_RADIUS/2;
+            y_pos = 3 * SCREEN_WIDTH / 4 - COIN_RADIUS - COIN_RADIUS/2;
         }
-        y_pos = 0; // Start at top of screen
+        x_pos = 320; // Start at right of screen
 
         // Until we get graphics, represent coin as a circle
         LCD.SetFontColor(YELLOW);
@@ -125,10 +125,10 @@ class Coin {
         LCD.SetFontColor(WHITE);
     }
     void nextFrame(){
-        // Move coin down the screen
+        // Move coin left across the screen
         LCD.SetFontColor(BLACK);
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Erase old position
-        y_pos += 5; // Move down 5 pixels
+        x_pos -= 5; // Move left 5 pixels
         LCD.SetFontColor(YELLOW);
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Draw at new position
         LCD.SetFontColor(WHITE);
@@ -143,24 +143,24 @@ class Car {
     public:
     Car(int lane){
         if (lane == 1){
-            x_pos = SCREEN_WIDTH / 4 + 4;
+            y_pos = SCREEN_WIDTH / 4 + 4;
         } else if (lane == 2){
-            x_pos = SCREEN_WIDTH / 2 - 12;
+            y_pos = SCREEN_WIDTH / 2 - 12;
         } else if (lane == 3){
-            x_pos = 3 * SCREEN_WIDTH / 4 - 26;
+            y_pos = 3 * SCREEN_WIDTH / 4 - 26;
         }
-        y_pos = 0;
+        x_pos = 320;
 
         carSprite.Open("Car.png");
         carSprite.Draw(x_pos, y_pos);
     }
     void nextFrame(){
-        // Move car down the screen
+        // Move car left across the screen
         LCD.SetFontColor(BLACK);
-        LCD.FillRectangle(x_pos, y_pos, 30 , 60); // Erase old car
+        LCD.FillRectangle(x_pos, y_pos, 60 , 30); // Erase old car
         LCD.SetFontColor(WHITE);
 
-        y_pos += 5;
+        x_pos -= 5;
         carSprite.Draw(x_pos, y_pos);
     }
 };
@@ -173,24 +173,24 @@ class Bus {
     public:
     Bus(int lane){
         if (lane == 1){
-            x_pos = SCREEN_WIDTH / 4 + 4;
+            y_pos = SCREEN_WIDTH / 4 + 4;
         } else if (lane == 2){
-            x_pos = SCREEN_WIDTH / 2 - 12;
+            y_pos = SCREEN_WIDTH / 2 - 12;
         } else if (lane == 3){
-            x_pos = 3 * SCREEN_WIDTH / 4 - 26;
+            y_pos = 3 * SCREEN_WIDTH / 4 - 26;
         }
-        y_pos = 0;
+        x_pos = 320;
 
         busSprite.Open("Bus.png");
         busSprite.Draw(x_pos, y_pos);
     }
     void nextFrame(){
-        // Move car down the screen
+        // Move bus left across the screen
         LCD.SetFontColor(BLACK);
-        LCD.FillRectangle(x_pos, y_pos, 30 , 60); // Erase old bus
+        LCD.FillRectangle(x_pos, y_pos, 80, 30); // Erase old bus
         LCD.SetFontColor(WHITE);
 
-        y_pos += 5;
+        x_pos -= 5;
         busSprite.Draw(x_pos, y_pos);
     }
 };
@@ -266,10 +266,10 @@ void drawPlay()
     LCD.WriteAt("<", 5, 5);
 
     // Draw lanes - TODO: Replace with dashed lines
-    LCD.DrawLine(SCREEN_WIDTH / 5, 0, SCREEN_WIDTH / 5, SCREEN_HEIGHT);
-    LCD.DrawLine(SCREEN_WIDTH * 2 / 5, 0, SCREEN_WIDTH * 2 / 5, SCREEN_HEIGHT);
-    LCD.DrawLine(SCREEN_WIDTH * 3 / 5, 0, SCREEN_WIDTH * 3 / 5, SCREEN_HEIGHT);
-    LCD.DrawLine(SCREEN_WIDTH * 4 / 5, 0, SCREEN_WIDTH * 4 / 5, SCREEN_HEIGHT);
+    LCD.DrawLine(0, SCREEN_HEIGHT / 5, SCREEN_WIDTH, SCREEN_HEIGHT / 5);
+    LCD.DrawLine(0, SCREEN_HEIGHT * 2 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 2 / 5);
+    LCD.DrawLine(0, SCREEN_HEIGHT * 3 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 3 / 5);
+    LCD.DrawLine(0, SCREEN_HEIGHT * 4 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 4 / 5);
 
     //TO DO: Intro screens
 
@@ -520,6 +520,3 @@ void endScreen()
     drawMenu();
 
 }
-
-
-
