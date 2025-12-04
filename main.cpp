@@ -5,6 +5,7 @@
 
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
+#define PIXELS_PER_FRAME 5
 
 void drawMenu();
 void drawPlay();
@@ -13,8 +14,13 @@ void drawInstructions();
 void drawCredits();
 void introScreen();
 void nextGameFrame(bool reset);
-void userInput();
 void endScreen();
+
+// Make compiler happy
+class Coin;
+class Car;
+class Bus;
+void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses);
 
 class Player {
     private:
@@ -125,7 +131,7 @@ class Coin {
         // Move coin left across the screen
         LCD.SetFontColor(BLACK);
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Erase old position
-        x_pos -= 5; // Move left 5 pixels
+        x_pos -= PIXELS_PER_FRAME; // Move left
         LCD.SetFontColor(YELLOW);
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Draw at new position
         LCD.SetFontColor(WHITE);
@@ -138,6 +144,7 @@ class Car {
         int x_pos, y_pos;
         FEHImage carSprite;
     public:
+        static const int CAR_WIDTH = 45;
     Car(int lane){
         if (lane == 1){
             y_pos = SCREEN_WIDTH / 5;
@@ -154,10 +161,10 @@ class Car {
     void nextFrame(){
         // Move car left across the screen
         LCD.SetFontColor(BLACK);
-        LCD.FillRectangle(x_pos, y_pos, 60 , 30); // Erase old car
+        LCD.FillRectangle(x_pos, y_pos, CAR_WIDTH , 30); // Erase old car
         LCD.SetFontColor(WHITE);
 
-        x_pos -= 5;
+        x_pos -= PIXELS_PER_FRAME;
         carSprite.Draw(x_pos, y_pos);
     }
 };
@@ -187,7 +194,7 @@ class Bus {
         LCD.FillRectangle(x_pos, y_pos, 80, 30); // Erase old bus
         LCD.SetFontColor(WHITE);
 
-        x_pos -= 5;
+        x_pos -= PIXELS_PER_FRAME;
         busSprite.Draw(x_pos, y_pos);
     }
 };
@@ -323,44 +330,44 @@ void introScreen()
 
 void nextGameFrame(bool reset){
     // All objects should be declared static so their locations/states are maintained
-    // Should probably implement with object arrays
-    /* This is for TESTING right now, eventually will need to randomly generate coins and cars, check collisions, delete off-screen objects, etc.*/
     // Reminder, the object constructors take in lane number (1 = left, 2 = center, 3 = right)
-    static Coin coin1(1);
-    static Coin coin2(2);
-    static Coin coin3(3);
-
-    static Car car1(1);
-    static Car car2(2);
-    static Car car3(3);
-    
-    static Bus bus1(3);
-    static Bus bus2(3);
-    static Bus bus3(3);
+    static std::vector<Coin> coins;
+    static std::vector<Car> cars;
+    static std::vector<Bus> buses;
 
     static Player player(2);
 
-    // reset game when coming back from menu - this needs updated
+    // Count frames for object generating timing
+    static int frameCount = -1;
+    frameCount++;
+
+    // Reset game when coming back from menu - this needs updated
     if (reset) {
-        coin1 = Coin(1);
-        coin2 = Coin(2);
-        coin3 = Coin(3);
-        car1 = Car(1);
-        car2 = Car(2);
-        bus1 = Bus(3);
+        // Recreate all objects
+        frameCount = 0;
+        coins.clear();
+        cars.clear();
+        buses.clear();
         player = Player(2);
     }
 
+    // Handle random generation of obstacles/coins
+    // 5 is how many pixels per frame objects move - every time a row of objects moves a car's width, generate new row
+    // I don't like C :( - why can't I use the dot operator with static variables?
+    if ((frameCount % (Car::CAR_WIDTH / PIXELS_PER_FRAME)) == 0) {
+        generateNewRow(&coins, &cars, &buses);
+    }
+
     // Move all objects down/next animation frame
-    coin1.nextFrame();
-    coin2.nextFrame();
-    coin3.nextFrame();
-    car1.nextFrame();
-    car2.nextFrame();
-    car3.nextFrame();
-    bus1.nextFrame();
-    bus2.nextFrame();
-    bus3.nextFrame();
+    for (int i = 0; i < coins.size(); i++) {
+        coins[i].nextFrame();
+    }
+    for (int i = 0; i < cars.size(); i++) {
+        cars[i].nextFrame();
+    }
+    for (int i = 0; i < buses.size(); i++) {
+        buses[i].nextFrame();
+    }
     
     // Move when arrow keys pressed
     if (Keyboard.isPressed(KEY_LEFT) || Keyboard.isPressed(KEY_UP)){
@@ -369,7 +376,13 @@ void nextGameFrame(bool reset){
         player.moveDown();
     }
 
-    // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
+    // TODO: Delete objects that go off screen and create new ones at top (prob do this with class methods?)
+}
+
+void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
+    (*coins).push_back(Coin(1));
+    (*cars).push_back(Car(2));
+    (*buses).push_back(Bus(3));
 }
 
 void drawStatistics()
@@ -418,7 +431,7 @@ void drawInstructions()
     LCD.SetFontScale(0.5);
     LCD.WriteAt("Instructions", 20, 30);
     LCD.WriteAt("1. Watch the storyline to see how you come to be a", 20, 60);
-    LCD.WriteAt("hero and in the middle of a heist!", 20, 90);
+    LCD.WriteAt("hero in the middle of a heist!", 20, 90);
     LCD.WriteAt("2. Begin the chase once the officer catche", 20, 120);
     LCD.WriteAt("to be a hero and in the middle of a heist!", 20, 150);     
     LCD.WriteAt("3. Use your keyboard to navigate around obstacles" , 20, 180);
