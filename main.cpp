@@ -45,6 +45,7 @@ class Player {
         y_pos = 300; // Start at bottom of screen
     }
     //X Position will be top left corner of picture to draw;
+    // Would be cool if we can make these smooth
     void moveRight()
     {
         LCD.SetFontColor(BLACK);
@@ -73,7 +74,7 @@ class Player {
     }
     void moveLeft()
     {
-        LCD.SetFontColor(WHITE);
+        LCD.SetFontColor(BLACK);
         if(lane == 2)
         {
             lane = lane - 1;
@@ -96,9 +97,6 @@ class Player {
             LCD.FillRectangle(199, 190, 50, 50);
         }
     }
-
-    
-
 };
 
 class Coin {
@@ -167,7 +165,33 @@ class Car {
 };
 
 class Bus {
+    private:
+        int lane;
+        int x_pos, y_pos;
+        FEHImage busSprite;
+    public:
+    Bus(int lane){
+        if (lane == 1){
+            x_pos = SCREEN_WIDTH / 4 + 4;
+        } else if (lane == 2){
+            x_pos = SCREEN_WIDTH / 2 - 12;
+        } else if (lane == 3){
+            x_pos = 3 * SCREEN_WIDTH / 4 - 26;
+        }
+        y_pos = 0;
 
+        busSprite.Open("Bus.png");
+        busSprite.Draw(x_pos, y_pos);
+    }
+    void nextFrame(){
+        // Move car down the screen
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(x_pos, y_pos, 30 , 60); // Erase old bus
+        LCD.SetFontColor(WHITE);
+
+        y_pos += 5;
+        busSprite.Draw(x_pos, y_pos);
+    }
 };
 
 int main()
@@ -195,16 +219,14 @@ void drawMenu() {
     LCD.WriteAt("Instructions", 100, 100 + 5);
     LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 150, boxWidth, boxHeight); // Statistics
-     LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 150, boxWidth, boxHeight);
+    LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 150, boxWidth, boxHeight);
     LCD.SetFontColor(WHITE);
     LCD.WriteAt("Statistics", SCREEN_WIDTH / 2 - boxWidth / 4, 150 + 5);
     LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 200, boxWidth, boxHeight); // Credits
-     LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 200, boxWidth, boxHeight);
+    LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 200, boxWidth, boxHeight);
     LCD.SetFontColor(WHITE);
     LCD.WriteAt("Credits", 120, 200 + 5);
-
-    
     
     LCD.Update();
 
@@ -248,7 +270,8 @@ void drawPlay()
     LCD.DrawLine(SCREEN_WIDTH * 3 / 5, 0, SCREEN_WIDTH * 3 / 5, SCREEN_HEIGHT);
     LCD.DrawLine(SCREEN_WIDTH * 4 / 5, 0, SCREEN_WIDTH * 4 / 5, SCREEN_HEIGHT);
 
-    
+    //TO DO: Intro screens
+
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     bool reset = true; // To reset game state on first frame after entering from menu
@@ -302,6 +325,7 @@ void introScreen()
 
 void nextGameFrame(bool reset){
     // All objects should be declared static so their locations/states are maintained
+    // Should probably implement with object arrays
     /* This is for TESTING right now, eventually will need to randomly generate coins and cars, check collisions, delete off-screen objects, etc.*/
     // Reminder, the object constructors take in lane number (1 = left, 2 = center, 3 = right)
     static Coin coin1(1);
@@ -310,7 +334,11 @@ void nextGameFrame(bool reset){
 
     static Car car1(1);
     static Car car2(2);
-    static Car car3(3);
+    
+    static Bus bus1(3);
+
+    static Player player(2);
+
     // reset game when coming back from menu
     if (reset) {
         coin1 = Coin(1);
@@ -318,7 +346,8 @@ void nextGameFrame(bool reset){
         coin3 = Coin(3);
         car1 = Car(1);
         car2 = Car(2);
-        car3 = Car(3);
+        bus1 = Bus(3);
+        player = Player(2);
     }
 
     // Move all objects down/next animation frame
@@ -327,7 +356,14 @@ void nextGameFrame(bool reset){
     coin3.nextFrame();
     car1.nextFrame();
     car2.nextFrame();
-    car3.nextFrame();
+    bus1.nextFrame();
+    
+    // Move when arrow keys pressed
+    if (Keyboard.isPressed(KEY_LEFT)){
+        player.moveLeft();
+    } else if (Keyboard.isPressed(KEY_RIGHT)){
+        player.moveRight();
+    }
 
     // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
 }
