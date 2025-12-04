@@ -2,9 +2,11 @@
 #include <FEHImages.h>
 #include <FEHUtility.h>
 #include <FEHKeyboard.h>
+#include <FEHRandom.h>
 
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
+
+#define SCREEN_WIDTH 319
+#define SCREEN_HEIGHT 239
 #define PIXELS_PER_FRAME 5
 
 void drawMenu();
@@ -21,6 +23,7 @@ class Coin;
 class Car;
 class Bus;
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses);
+void deleteOffScreenObjects(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses);
 
 class Player {
     private:
@@ -55,51 +58,33 @@ class Player {
     // Would be cool if we can make these smooth
     void moveUp()
     {
-        LCD.SetFontColor(BLACK);
-        int old_y = y_pos;
-      
         if(lane == 2)
         {
             lane = 1;
             y_pos = 50;
-
-            // Erase old sprite then draw at new position
-            LCD.FillRectangle(x_pos, old_y, SPRITE_W, SPRITE_H);
-            image.Draw(x_pos, y_pos);
         }
         else if(lane == 3)
         {
             lane = 2;
             y_pos = 98;
-
-            // Erase old sprite then draw at new position
-            LCD.FillRectangle(x_pos, old_y, SPRITE_W, SPRITE_H);
-            image.Draw(x_pos, y_pos);
         } 
-
-        
     }
     void moveDown()
     {
-        LCD.SetFontColor(BLACK);
-        int old_y = y_pos;
-
         if(lane == 2)
         {
             lane = 3;
             y_pos = 146;
-            // Erase old sprite then draw at new position
-            LCD.FillRectangle(x_pos, old_y, SPRITE_W, SPRITE_H);
-            image.Draw(x_pos, y_pos);
         }
         else if(lane == 1)
         {
             lane = 2;
             y_pos = 98;
-            // Erase old sprite then draw at new position
-            LCD.FillRectangle(x_pos, old_y, SPRITE_W, SPRITE_H);
-            image.Draw(x_pos, y_pos);
         } 
+    }
+    // Redraw player each frame
+    void draw() {
+        image.Draw(x_pos, y_pos);
     }
 };
 
@@ -120,21 +105,25 @@ class Coin {
         else if(lane == 3){
             y_pos = 3 * SCREEN_HEIGHT / 4 - COIN_RADIUS;
         }
-        x_pos = 320; // Start at right of screen
+        x_pos = SCREEN_WIDTH + COIN_RADIUS*2; // Start at right of screen
 
         // Until we get graphics, represent coin as a circle
         LCD.SetFontColor(YELLOW);
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS);
         LCD.SetFontColor(WHITE);
     }
-    void nextFrame(){
+    void updatePosition(){
         // Move coin left across the screen
-        LCD.SetFontColor(BLACK);
-        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Erase old position
         x_pos -= PIXELS_PER_FRAME; // Move left
+    }
+    // Redraw coin each frame
+    void draw(){
         LCD.SetFontColor(YELLOW);
-        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Draw at new position
+        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS);
         LCD.SetFontColor(WHITE);
+    }
+    int getXPos(){
+        return x_pos;
     }
 };
 
@@ -153,19 +142,21 @@ class Car {
         } else if (lane == 3){
             y_pos = SCREEN_WIDTH / 5 + 92;
         }
-        x_pos = 320;
+        x_pos = SCREEN_WIDTH;
 
         carSprite.Open("Car.png");
         carSprite.Draw(x_pos, y_pos);
     }
-    void nextFrame(){
+    void updatePosition(){
         // Move car left across the screen
-        LCD.SetFontColor(BLACK);
-        LCD.FillRectangle(x_pos, y_pos, CAR_WIDTH , 30); // Erase old car
-        LCD.SetFontColor(WHITE);
-
         x_pos -= PIXELS_PER_FRAME;
+    }
+    // Redraw car each frame
+    void draw(){
         carSprite.Draw(x_pos, y_pos);
+    }
+    int getXPos(){
+        return x_pos;
     }
 };
 
@@ -183,24 +174,30 @@ class Bus {
         } else if (lane == 3){
             y_pos = SCREEN_WIDTH / 5 + 92;
         }
-        x_pos = 320;
+        x_pos = SCREEN_WIDTH;
 
         busSprite.Open("Bus.png");
         busSprite.Draw(x_pos, y_pos);
     }
-    void nextFrame(){
-        // Move bus left across the screen
-        LCD.SetFontColor(BLACK);
-        LCD.FillRectangle(x_pos, y_pos, 80, 30); // Erase old bus
-        LCD.SetFontColor(WHITE);
 
+    void updatePosition(){
+        // Move bus left across the screen
         x_pos -= PIXELS_PER_FRAME;
+    }
+    // Redraw bus each frame
+    void draw(){
         busSprite.Draw(x_pos, y_pos);
+    }
+    int getXPos(){
+        return x_pos;
     }
 };
 
 int main()
 {
+    // Don't print warnings
+    freopen("/dev/null", "w", stdout);
+
     drawMenu();
 }
 
@@ -358,15 +355,18 @@ void nextGameFrame(bool reset){
         generateNewRow(&coins, &cars, &buses);
     }
 
-    // Move all objects down/next animation frame
+    // Clear screen to get ready for redraw
+    LCD.Clear();
+
+    // Update positions
     for (int i = 0; i < coins.size(); i++) {
-        coins[i].nextFrame();
+        coins[i].updatePosition();
     }
     for (int i = 0; i < cars.size(); i++) {
-        cars[i].nextFrame();
+        cars[i].updatePosition();
     }
     for (int i = 0; i < buses.size(); i++) {
-        buses[i].nextFrame();
+        buses[i].updatePosition();
     }
     
     // Move when arrow keys pressed
@@ -376,13 +376,84 @@ void nextGameFrame(bool reset){
         player.moveDown();
     }
 
-    // TODO: Delete objects that go off screen and create new ones at top (prob do this with class methods?)
+    // TODO: Delete objects that go off screen and create new ones at top
+    deleteOffScreenObjects(&coins, &cars, &buses);
+
+    // Redraw lanes after clearing
+    LCD.SetFontColor(WHITE);
+    LCD.DrawLine(0, SCREEN_HEIGHT / 5, SCREEN_WIDTH, SCREEN_HEIGHT / 5);
+    LCD.DrawLine(0, SCREEN_HEIGHT * 2 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 2 / 5);
+    LCD.DrawLine(0, SCREEN_HEIGHT * 3 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 3 / 5);
+    LCD.DrawLine(0, SCREEN_HEIGHT * 4 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 4 / 5);
+
+    // Redraw all objectss
+    for (int i = 0; i < coins.size(); i++) {
+        coins[i].draw();
+    }
+    for (int i = 0; i < cars.size(); i++) {
+        cars[i].draw();
+    }
+    for (int i = 0; i < buses.size(); i++) {
+        buses[i].draw();
+    }
+    
+    // Redraw player
+    player.draw();
+
+    // Redraw back button
+    LCD.DrawRectangle(5, 5, 20, 20);
+    LCD.WriteAt("<", 5, 5);
 }
 
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
-    (*coins).push_back(Coin(1));
-    (*cars).push_back(Car(2));
-    (*buses).push_back(Bus(3));
+    // Track if bus was last so we know not to generate a vehicle again right after
+    static bool busLast = false;
+    static int lastCoinLane;
+
+    if (!busLast) {
+        // Generate coin in any lane
+        int coinLane = (Random.RandInt())/10923 + 1; // Give random int from one to 3
+        (*coins).push_back(Coin(coinLane));
+        lastCoinLane = coinLane;
+
+        int obstacleLane = (Random.RandInt())/10923 + 1;
+        // Make sure obstacle is not in same lane as coin
+        while (obstacleLane == coinLane){
+            obstacleLane = (Random.RandInt())/10923 + 1;
+        }
+
+        int obstacleType = (Random.RandInt())/16383;
+        if (obstacleType == 0){
+            (*cars).push_back(Car(obstacleLane));
+        }else{
+            (*buses).push_back(Bus(obstacleLane));
+            busLast = true;
+        }
+    } else {
+        // Generate coin in the last lane it was in
+        (*coins).push_back(Coin(lastCoinLane));
+
+        busLast = false;
+    }
+}
+
+void deleteOffScreenObjects(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
+    
+    for (int i = (*coins).size() - 1; i >= 0; i--) {
+        if ((*coins)[i].getXPos() < -10){
+            (*coins).erase((*coins).begin() + i);
+        }
+    }
+    for (int i = (*cars).size() - 1; i >= 0; i--) {
+        if ((*cars)[i].getXPos() < -45){
+            (*cars).erase((*cars).begin() + i);
+        }
+    }
+    for (int i = (*buses).size() - 1; i >= 0; i--) {
+        if ((*buses)[i].getXPos() < -90){
+            (*buses).erase((*buses).begin() + i);
+        }
+    }
 }
 
 void drawStatistics()
@@ -533,5 +604,4 @@ void endScreen()
     }
     LCD.Clear();
     drawMenu();
-
 }
