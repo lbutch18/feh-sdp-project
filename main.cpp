@@ -14,6 +14,7 @@ void drawCredits();
 void introScreen();
 void nextGameFrame(bool reset);
 void userInput();
+void endScreen();
 
 class Player {
     private:
@@ -452,14 +453,16 @@ void drawCredits()
     
     //LCD.SetFontScale(0.5);
     //LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
-    
-    
+
+        
 
     
       
     LCD.SetFontScale(1.0);
     
     
+ 
+    LCD.SetFontColor(WHITE);  
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
     float x_pos, y_pos, x_dummy, y_dummy;
@@ -477,3 +480,46 @@ void drawCredits()
     LCD.Clear();
     drawMenu();
 }
+
+
+
+//parameter of stats
+void endScreen()
+{
+    LCD.Clear();
+    FEHImage end;
+    end.Open("Menu Screen.png");
+    end.Draw(0,0);
+    LCD.SetFontColor(BLACK);
+    LCD.DrawRectangle(10, 40, 300, 220);
+    LCD.FillRectangle(10, 40, 300, 220);
+    LCD.SetFontColor(WHITE);
+    LCD.WriteAt("Game Over!", 20, 50);
+    LCD.WriteAt( "Coins Collected: 19", 20, 80);
+    LCD.WriteAt("Distance traveled: 0 m", 20, 110);
+    LCD.WriteAt("Questions Answered", 20, 140);
+    LCD.WriteAt("Correctly: 0/0 (0%)", 20, 170);
+    
+    LCD.SetFontColor(WHITE);  
+    LCD.DrawRectangle(5, 5, 20, 20);
+    LCD.WriteAt("<", 5, 5);
+    LCD.Update();
+    float x_pos, y_pos, x_dummy, y_dummy;
+    bool exit = false;
+    while(!exit)
+    {
+        while (!LCD.Touch(&x_pos, &y_pos));
+        while (LCD.Touch(&x_dummy, &y_dummy));
+        while (LCD.Touch(&x_dummy, &y_dummy));
+        while (LCD.Touch(&x_dummy, &y_dummy));
+         if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
+            exit = true;
+        }
+    }
+    LCD.Clear();
+    drawMenu();
+
+}
+
+
+
