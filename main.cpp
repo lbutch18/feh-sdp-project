@@ -361,9 +361,9 @@ void nextGameFrame(bool reset){
     
     // Move when arrow keys pressed
     if (Keyboard.isPressed(KEY_LEFT)){
-        player.moveLeft();
+        player.moveUp();
     } else if (Keyboard.isPressed(KEY_RIGHT)){
-        player.moveRight();
+        player.moveDown();
     }
 
     // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
@@ -453,8 +453,8 @@ void drawCredits()
     
     //LCD.SetFontScale(0.5);
     //LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
+   
 
-        
 
     
       
@@ -520,6 +520,8 @@ void endScreen()
     drawMenu();
 
 }
+
+
 
 
 
