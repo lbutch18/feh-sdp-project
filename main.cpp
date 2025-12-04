@@ -27,86 +27,84 @@ class Player {
     {
         if (inputLane == 1){
             lane = 1;
-            x_pos = 71;
-            image.Open("player.png");
-            image.Draw(71, 190);
+            y_pos = 50;
+            image.Open("player updated.png");
+            image.Draw(5, 50);
         }
         else if (inputLane == 2){
             lane = 2;
-            x_pos =  135;
-            image.Open("player.png");
-            image.Draw(135, 190);
+            y_pos =  98;
+            image.Open("player updated.png");
+            image.Draw(5, 98);
         } 
         else if(inputLane == 3){
             lane = 3;
-            x_pos = 199;
-            image.Open("player.png");
-            image.Draw(199, 190);
+            y_pos = 146;
+            image.Open("player updated.png");
+            image.Draw(5, 146);
         }
-        y_pos = 300; // Start at bottom of screen
+        x_pos = 5; // Start at left
     }
     //X Position will be top left corner of picture to draw;
-    void moveRight()
+    // Would be cool if we can make these smooth
+    void moveUp()
     {
         LCD.SetFontColor(BLACK);
       
         if(lane == 2)
         {
-            lane = lane + 1;
-            LCD.DrawRectangle(135, 190, 50, 50);
-            LCD.FillRectangle(135, 190, 50, 50);
-            x_pos = 199;
-            FEHImage image;
-            image.Open("player.png");
-            image.Draw(x_pos, 190);
-        }
-        else if(lane == 1)
-        {
-            lane = lane + 1;
-            LCD.DrawRectangle(71, 190, 50, 50);
-            LCD.FillRectangle(71, 190, 50, 50);
-            x_pos = 135;
-            FEHImage image;
-            image.Open("player.png");
-            image.Draw(135, 190);
-            
-        }
-    }
-    void moveLeft()
-    {
-        LCD.SetFontColor(WHITE);
-        if(lane == 2)
-        {
             lane = lane - 1;
-            x_pos = 71;
+            LCD.DrawRectangle(5, 98, 45, 45);
+            LCD.FillRectangle(5, 98, 45, 45);
+            y_pos = 50;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(x_pos, 190);
-            LCD.DrawRectangle(135, 190, 50, 50);
-            LCD.FillRectangle(135, 190, 50, 50);
-            
+            image.Draw(5, y_pos);
         }
         else if(lane == 3)
         {
             lane = lane - 1;
-            x_pos = 135;
+            LCD.DrawRectangle(5, 146, 50, 50);
+            LCD.FillRectangle(5, 146, 50, 50);
+            x_pos = 98;
             FEHImage image;
             image.Open("player.png");
-            image.Draw(x_pos, 190);
-            LCD.DrawRectangle(199, 190, 50, 50);
-            LCD.FillRectangle(199, 190, 50, 50);
+            image.Draw(5, y_pos);
+            
         }
     }
-
-    
-
+    void moveDown()
+    {
+        LCD.SetFontColor(BLACK);
+        if(lane == 2)
+        {
+            lane = lane - 1;
+            y_pos = 146;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(5, y_pos);
+            LCD.DrawRectangle(5, 98, 50, 50);
+            LCD.FillRectangle(5, 98, 50, 50);
+            
+        }
+        else if(lane == 1)
+        {
+            lane = lane - 1;
+            y_pos = 98;
+            FEHImage image;
+            image.Open("player.png");
+            image.Draw(5, y_pos);
+            LCD.DrawRectangle(5, 50, 50, 50);
+            LCD.FillRectangle(5, 50, 50, 50);
+        }
+    }
 };
 
 class Coin {
     private:
         int lane = 1; // Default lane
         int x_pos, y_pos;
-        int COIN_RADIUS = 10;
+        #define COIN_RADIUS 10
     public:
     // Constructor - lane 1 is left, 2 is center, 3 is left
     Coin(int lane){
@@ -135,11 +133,66 @@ class Coin {
         LCD.FillCircle(x_pos, y_pos, COIN_RADIUS); // Draw at new position
         LCD.SetFontColor(WHITE);
     }
-    
 };
 
-class Obstacle {
+class Car {
+    private:
+        int lane;
+        int x_pos, y_pos;
+        FEHImage carSprite;
+    public:
+    Car(int lane){
+        if (lane == 1){
+            x_pos = SCREEN_WIDTH / 4 + 4;
+        } else if (lane == 2){
+            x_pos = SCREEN_WIDTH / 2 - 12;
+        } else if (lane == 3){
+            x_pos = 3 * SCREEN_WIDTH / 4 - 26;
+        }
+        y_pos = 0;
 
+        carSprite.Open("Car.png");
+        carSprite.Draw(x_pos, y_pos);
+    }
+    void nextFrame(){
+        // Move car down the screen
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(x_pos, y_pos, 30 , 60); // Erase old car
+        LCD.SetFontColor(WHITE);
+
+        y_pos += 5;
+        carSprite.Draw(x_pos, y_pos);
+    }
+};
+
+class Bus {
+    private:
+        int lane;
+        int x_pos, y_pos;
+        FEHImage busSprite;
+    public:
+    Bus(int lane){
+        if (lane == 1){
+            x_pos = SCREEN_WIDTH / 4 + 4;
+        } else if (lane == 2){
+            x_pos = SCREEN_WIDTH / 2 - 12;
+        } else if (lane == 3){
+            x_pos = 3 * SCREEN_WIDTH / 4 - 26;
+        }
+        y_pos = 0;
+
+        busSprite.Open("Bus.png");
+        busSprite.Draw(x_pos, y_pos);
+    }
+    void nextFrame(){
+        // Move car down the screen
+        LCD.SetFontColor(BLACK);
+        LCD.FillRectangle(x_pos, y_pos, 30 , 60); // Erase old bus
+        LCD.SetFontColor(WHITE);
+
+        y_pos += 5;
+        busSprite.Draw(x_pos, y_pos);
+    }
 };
 
 int main()
@@ -167,16 +220,14 @@ void drawMenu() {
     LCD.WriteAt("Instructions", 100, 100 + 5);
     LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 150, boxWidth, boxHeight); // Statistics
-     LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 150, boxWidth, boxHeight);
+    LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 150, boxWidth, boxHeight);
     LCD.SetFontColor(WHITE);
     LCD.WriteAt("Statistics", SCREEN_WIDTH / 2 - boxWidth / 4, 150 + 5);
     LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 200, boxWidth, boxHeight); // Credits
-     LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 200, boxWidth, boxHeight);
+    LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 200, boxWidth, boxHeight);
     LCD.SetFontColor(WHITE);
     LCD.WriteAt("Credits", 120, 200 + 5);
-
-    
     
     LCD.Update();
 
@@ -220,7 +271,8 @@ void drawPlay()
     LCD.DrawLine(SCREEN_WIDTH * 3 / 5, 0, SCREEN_WIDTH * 3 / 5, SCREEN_HEIGHT);
     LCD.DrawLine(SCREEN_WIDTH * 4 / 5, 0, SCREEN_WIDTH * 4 / 5, SCREEN_HEIGHT);
 
-    
+    //TO DO: Intro screens
+
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     bool reset = true; // To reset game state on first frame after entering from menu
@@ -230,12 +282,12 @@ void drawPlay()
         // Run game frames until back button is pressed
         while (!LCD.Touch(&x_pos, &y_pos)){
             nextGameFrame(reset);
-            Sleep(50); // Frame rate
+            Sleep(100); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         while (LCD.Touch(&x_dummy, &y_dummy)){
             nextGameFrame(reset);
-            Sleep(50); // Frame rate
+            Sleep(100); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         
@@ -250,25 +302,21 @@ void drawPlay()
 
 void introScreen()
 {
-    //First screen in storyline
     LCD.Clear();
     FEHImage first;
     first.Open("Evil Money Guy Updated2.png");
     first.Draw(0,0);
 
-    //Second screen in storyline
     Sleep(2.5);
     FEHImage second;
     second.Open("Planning Guy Updated.png");
     second.Draw(0,0);
 
-    //Third screen in storyline
     Sleep(2.5);
     FEHImage third;
     third.Open("Heist Happening Updated 1.png");
     third.Draw(0,0);
 
-    //Fourth screen in storyline
     Sleep(2.5);
     FEHImage fourth;
     fourth.Open("Final Intro Screen Updated.png");
@@ -277,17 +325,48 @@ void introScreen()
 }
 
 void nextGameFrame(bool reset){
+    // All objects should be declared static so their locations/states are maintained
+    // Should probably implement with object arrays
+    /* This is for TESTING right now, eventually will need to randomly generate coins and cars, check collisions, delete off-screen objects, etc.*/
+    // Reminder, the object constructors take in lane number (1 = left, 2 = center, 3 = right)
     static Coin coin1(1);
     static Coin coin2(2);
     static Coin coin3(3);
+
+    static Car car1(1);
+    static Car car2(2);
+    
+    static Bus bus1(3);
+
+    static Player player(2);
+
+    // reset game when coming back from menu
     if (reset) {
         coin1 = Coin(1);
         coin2 = Coin(2);
         coin3 = Coin(3);
+        car1 = Car(1);
+        car2 = Car(2);
+        bus1 = Bus(3);
+        player = Player(2);
     }
+
+    // Move all objects down/next animation frame
     coin1.nextFrame();
     coin2.nextFrame();
     coin3.nextFrame();
+    car1.nextFrame();
+    car2.nextFrame();
+    bus1.nextFrame();
+    
+    // Move when arrow keys pressed
+    if (Keyboard.isPressed(KEY_LEFT)){
+        player.moveLeft();
+    } else if (Keyboard.isPressed(KEY_RIGHT)){
+        player.moveRight();
+    }
+
+    // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
 }
 
 void drawStatistics()
@@ -315,7 +394,6 @@ void drawStatistics()
     //Draw back button
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
-    //Loop until button is pressed
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
@@ -328,13 +406,11 @@ void drawStatistics()
         
     }
     LCD.Clear();
-    //Return to menu screen
     drawMenu();
 }
 
 void drawInstructions()
 {
-    //Finish screen
     LCD.Clear();
     LCD.SetFontScale(0.5);
     LCD.WriteAt("Instructions", 20, 30);
