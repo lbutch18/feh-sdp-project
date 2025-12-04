@@ -22,81 +22,78 @@ class Player {
         int x_pos, y_pos;
         int PLAYER_RADIUS = 10;
         FEHImage image;
+        int SPRITE_W = 40;
+        int SPRITE_H = 40;
     public:
     Player(int inputLane)
     {
+        image.Open("player updated.png");
+        x_pos = 5; // Start at left
         if (inputLane == 1){
             lane = 1;
             y_pos = 50;
-            image.Open("player updated.png");
-            image.Draw(5, 50);
+            image.Draw(x_pos, y_pos);
         }
         else if (inputLane == 2){
             lane = 2;
             y_pos =  98;
-            image.Open("player updated.png");
-            image.Draw(5, 98);
+            image.Draw(x_pos, y_pos);
         } 
         else if(inputLane == 3){
             lane = 3;
             y_pos = 146;
-            image.Open("player updated.png");
-            image.Draw(5, 146);
+            image.Draw(x_pos, y_pos);
         }
-        x_pos = 5; // Start at left
     }
     //X Position will be top left corner of picture to draw;
     // Would be cool if we can make these smooth
     void moveUp()
     {
         LCD.SetFontColor(BLACK);
+        int old_y = y_pos;
       
         if(lane == 2)
         {
-            lane = lane - 1;
-            LCD.DrawRectangle(5, 98, 45, 45);
-            LCD.FillRectangle(5, 98, 45, 45);
+            lane = 1;
             y_pos = 50;
-            FEHImage image;
-            image.Open("player.png");
-            image.Draw(5, y_pos);
+
+            // Erase old sprite then draw at new position
+            LCD.FillRectangle(x_pos, old_y, SPRITE_W, SPRITE_H);
+            image.Draw(x_pos, y_pos);
         }
         else if(lane == 3)
         {
-            lane = lane - 1;
-            LCD.DrawRectangle(5, 146, 50, 50);
-            LCD.FillRectangle(5, 146, 50, 50);
-            x_pos = 98;
-            FEHImage image;
-            image.Open("player.png");
-            image.Draw(5, y_pos);
-            
-        }
+            lane = 2;
+            y_pos = 98;
+
+            // Erase old sprite then draw at new position
+            LCD.FillRectangle(x_pos, old_y, SPRITE_W, SPRITE_H);
+            image.Draw(x_pos, y_pos);
+        } 
+
+        
     }
     void moveDown()
     {
         LCD.SetFontColor(BLACK);
+        int old_y = y_pos;
+
         if(lane == 2)
         {
-            lane = lane - 1;
+            lane = 3;
             y_pos = 146;
-            FEHImage image;
-            image.Open("player.png");
-            image.Draw(5, y_pos);
-            LCD.DrawRectangle(5, 98, 50, 50);
-            LCD.FillRectangle(5, 98, 50, 50);
-            
+            // Erase old sprite then draw at new position
+            LCD.FillRectangle(x_pos, old_y, SPRITE_W, SPRITE_H);
+            image.Draw(x_pos, y_pos);
         }
         else if(lane == 1)
         {
-            lane = lane - 1;
+            lane = 2;
             y_pos = 98;
-            FEHImage image;
-            image.Open("player.png");
-            image.Draw(5, y_pos);
-            LCD.DrawRectangle(5, 50, 50, 50);
-            LCD.FillRectangle(5, 50, 50, 50);
-        }
+            // Erase old sprite then draw at new position
+            LCD.FillRectangle(x_pos, old_y, SPRITE_W, SPRITE_H);
+            image.Draw(x_pos, y_pos);
+        } 
     }
 };
 
@@ -437,7 +434,6 @@ void drawInstructions()
         if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
             exit = true;
         }
-        
     }
     LCD.Clear();
     LCD.SetFontScale(1.);
