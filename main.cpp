@@ -140,11 +140,11 @@ class Car {
     public:
     Car(int lane){
         if (lane == 1){
-            y_pos = SCREEN_WIDTH / 4 + 4;
+            y_pos = SCREEN_WIDTH / 5;
         } else if (lane == 2){
-            y_pos = SCREEN_WIDTH / 2 - 12;
+            y_pos = SCREEN_WIDTH / 5 + 42;
         } else if (lane == 3){
-            y_pos = 3 * SCREEN_WIDTH / 4 - 26;
+            y_pos = SCREEN_WIDTH / 5 + 92;
         }
         x_pos = 320;
 
@@ -170,11 +170,11 @@ class Bus {
     public:
     Bus(int lane){
         if (lane == 1){
-            y_pos = SCREEN_WIDTH / 4 + 4;
+            y_pos = SCREEN_WIDTH / 5;
         } else if (lane == 2){
-            y_pos = SCREEN_WIDTH / 2 - 12;
+            y_pos = SCREEN_WIDTH / 5 + 42;
         } else if (lane == 3){
-            y_pos = 3 * SCREEN_WIDTH / 4 - 26;
+            y_pos = SCREEN_WIDTH / 5 + 92;
         }
         x_pos = 320;
 
@@ -332,12 +332,15 @@ void nextGameFrame(bool reset){
 
     static Car car1(1);
     static Car car2(2);
+    static Car car3(3);
     
     static Bus bus1(3);
+    static Bus bus2(3);
+    static Bus bus3(3);
 
     static Player player(2);
 
-    // reset game when coming back from menu
+    // reset game when coming back from menu - this needs updated
     if (reset) {
         coin1 = Coin(1);
         coin2 = Coin(2);
@@ -354,7 +357,10 @@ void nextGameFrame(bool reset){
     coin3.nextFrame();
     car1.nextFrame();
     car2.nextFrame();
+    car3.nextFrame();
     bus1.nextFrame();
+    bus2.nextFrame();
+    bus3.nextFrame();
     
     // Move when arrow keys pressed
     if (Keyboard.isPressed(KEY_LEFT) || Keyboard.isPressed(KEY_UP)){
