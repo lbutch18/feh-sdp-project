@@ -185,7 +185,7 @@ class scrollImage
     }
     void nextFrame()
     {
-        x_pos = x_pos - 5; //Move left 5 units
+        x_pos = x_pos - 3; //Move left 3 units
         if(x_pos < 0)
         {
             x_pos = 320; //Don't draw past 0
