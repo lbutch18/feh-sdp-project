@@ -371,7 +371,7 @@ void nextGameFrame(bool reset){
     static int frameCount = -1;
     frameCount++;
 
-    // Reset game when coming back from menu - this needs updated
+    // Reset game when coming back from menu
     if (reset) {
         // Recreate all objects
         frameCount = 0;
@@ -382,7 +382,7 @@ void nextGameFrame(bool reset){
     }
 
     // Handle random generation of obstacles/coins
-    // 5 is how many pixels per frame objects move - every time a row of objects moves a car's width, generate new row
+    // Every time a row of objects moves a car's width, generate new row
     // I don't like C :( - why can't I use the dot operator with static variables?
     if ((frameCount % (Car::CAR_WIDTH / PIXELS_PER_FRAME)) == 0) {
         generateNewRow(&coins, &cars, &buses);
@@ -452,10 +452,10 @@ void nextGameFrame(bool reset){
 
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
     // Track if bus was last so we know not to generate a vehicle again right after
-    static bool busLast = false;
+    static int busLast = 0;
     static int lastCoinLane;
 
-    if (!busLast) {
+    if (busLast == 0) {
         // Generate coin in any lane
         int coinLane = (Random.RandInt())/10923 + 1; // Give random int from one to 3
         (*coins).push_back(Coin(coinLane));
@@ -472,13 +472,20 @@ void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vecto
             (*cars).push_back(Car(obstacleLane));
         }else{
             (*buses).push_back(Bus(obstacleLane));
-            busLast = true;
+            busLast++;
         }
-    } else {
+    } else if (busLast == 1) {
         // Generate coin in the last lane it was in
         (*coins).push_back(Coin(lastCoinLane));
+        busLast++;
+    } else if (busLast == 2){
+        // Generate coin in any lane
+        int coinLane = (Random.RandInt())/10923 + 1; // Give random int from one to 3
+        (*coins).push_back(Coin(coinLane));
+        lastCoinLane = coinLane;
 
-        busLast = false;
+        // Reset busLast
+        busLast = 0;
     }
 }
 
