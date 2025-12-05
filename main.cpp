@@ -363,14 +363,26 @@ void nextGameFrame(bool reset){
         buses[i].updatePosition();
     }
     
-    // Move when arrow keys pressed
-    if (Keyboard.isPressed(KEY_LEFT) || Keyboard.isPressed(KEY_UP)){
+    /* Move when arrow keys pressed, but can can't move two frames in a row to
+    prevent player from basically teleporting*/
+    static bool wasUpPressed = false;
+    static bool wasDownPressed = false;
+    
+    bool isUpPressed = Keyboard.isPressed(KEY_LEFT) || Keyboard.isPressed(KEY_UP);
+    bool isDownPressed = Keyboard.isPressed(KEY_RIGHT) || Keyboard.isPressed(KEY_DOWN);
+    
+    // Check is key was pressed last frame as well
+    if (!wasUpPressed && isUpPressed) {
         player.moveUp();
-    } else if (Keyboard.isPressed(KEY_RIGHT) || Keyboard.isPressed(KEY_DOWN)){
+    } else if (!wasDownPressed && isDownPressed) {
         player.moveDown();
     }
+    
+    // Update previous presses for next frame
+    wasUpPressed = isUpPressed;
+    wasDownPressed = isDownPressed;
 
-    // TODO: Delete objects that go off screen and create new ones at top
+    // Clean up objects that go off screen
     deleteOffScreenObjects(&coins, &cars, &buses);
 
     // Redraw lanes after clearing
