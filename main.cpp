@@ -16,6 +16,14 @@ void nextGameFrame(bool reset);
 void userInput();
 void endScreen();
 
+//Generative AI was used to create images throughout the game - for more thorough accreditation, please see our website
+
+/*
+Audrey Malcuit
+Creation of the player class
+Declaration of instance variables and instantiation of coordinates and initial appearance on screen according to input of lane
+This class creates the player and also creates two functions (moveUp and moveDown) for player movement between lanes which will be called in response to user input
+*/
 class Player {
     private:
         int lane;
@@ -47,6 +55,7 @@ class Player {
     }
     //X Position will be top left corner of picture to draw;
     // Would be cool if we can make these smooth
+
     void moveUp()
     {
         LCD.SetFontColor(BLACK);
@@ -97,6 +106,12 @@ class Player {
     }
 };
 
+/*
+Luke Butcher
+Creation of Coin class - radius of coin for dimension and plotting purposes, coordinates to draw and lane for logic with player and game in general
+Constructor: depends on the lane input and then will update coordinates accordingly
+nextFrame: function to move the coin across the screen
+*/
 class Coin {
     private:
         int lane = 1; // Default lane
@@ -132,6 +147,12 @@ class Coin {
     }
 };
 
+/*
+Audrey Malcuit
+Creation of scrollImage class to make the setting seem as if it was moving at the top and bottom of the screen
+Boolean to determine if it is at the top or bottom (for coordinate purposes), the actual image, and the coordinates
+nextFrame: function to move the images across the screen
+*/
 class scrollImage
 {
     private:
@@ -140,6 +161,8 @@ class scrollImage
         int x_pos, y_pos;
     public:
     //Will have to create starting images with x as input
+
+    //Empty constructor for array
     scrollImage()
     {
 
@@ -150,28 +173,35 @@ class scrollImage
         {
             image.Open("topSideWalk.png");
             x_pos = x;
-            y_pos = 0;
+            y_pos = 0; //top y coordinate
         }
         else
         {
-            image.Open("bottomSidewalk.png");
+            image.Open("bottomSidewalk.png"); //inverted image of top
             x_pos = x;
-            y_pos = 192;
+            y_pos = 192; //bottom y coordinate
         }
         image.Draw(x_pos, y_pos);
     }
     void nextFrame()
     {
-        x_pos = x_pos - 5;
+        x_pos = x_pos - 5; //Move left 5 units
         if(x_pos < 0)
         {
-            x_pos = 320;
+            x_pos = 320; //Don't draw past 0
         }
         image.Draw(x_pos, y_pos);
+
 
     }
 };
 
+/*
+Luke Butcher
+Creation of car class: lane, coordinates, and actual image
+Constructor: update coordinates and placement of image according to input of lane
+nextFrame: move the car across the screen
+*/
 class Car {
     private:
         int lane;
@@ -237,14 +267,21 @@ int main()
     drawMenu();
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Displays the menu screen and allows for buttons to be clicked and reroutes users to those screens
+*/
 void drawMenu() {
-    LCD.Clear();
+    LCD.Clear(); //Clear screen
+    //Constants for boxes
     int boxWidth = SCREEN_WIDTH / 1.5;
     int boxHeight = SCREEN_HEIGHT / 8;
     FEHImage menu;
-    menu.Open("Menu Screen.png");
+    menu.Open("Menu Screen.png"); //Menu background image
     menu.Draw(0,0);
     
+
+    //Create boxes of same dimensions, alter y coordinates throughout
     LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 50, boxWidth, boxHeight); // Play Button
     LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 50, boxWidth, boxHeight);\
@@ -271,6 +308,7 @@ void drawMenu() {
     float x_pos, y_pos, x_dummy, y_dummy;
     bool boxTouched = false;
 
+    //Loop until a button is pressed then respond to input and call respective function
     while (!boxTouched){
         while (!LCD.Touch(&x_pos, &y_pos));
         while (LCD.Touch(&x_dummy, &y_dummy));
@@ -294,6 +332,10 @@ void drawMenu() {
     }
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Finish this comment later
+*/
 void drawPlay()
 {
     LCD.Clear();
@@ -336,9 +378,13 @@ void drawPlay()
     drawMenu();
 }
 
-
+/*
+Audrey Malcuit
+Creation of AI images to display a beginning storyline to set up user for gameplay
+*/
 void introScreen()
 {
+    //Cycle through storyline screens
     LCD.Clear();
     FEHImage first;
     first.Open("Evil Money Guy Updated2.png");
@@ -412,6 +458,10 @@ void nextGameFrame(bool reset){
     // TODO: Delete objects that go off screen and create new ones at top (prob do this in class methods)
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Update this once statistic tracking is figured out
+*/
 void drawStatistics()
 {
     LCD.Clear();
@@ -452,15 +502,16 @@ void drawStatistics()
     drawMenu();
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Displays instructions screen and allows user to navigate back to menu screen
+*/
 void drawInstructions()
 {
     LCD.Clear();
-    LCD.SetFontScale(0.5);
     FEHImage instructions;
-    instructions.Open("fixed_instructions.png");
+    instructions.Open("fixed_instructions.png"); //Instructions picture
     instructions.Draw(0,0);
-
-    
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
@@ -468,6 +519,8 @@ void drawInstructions()
     //Draw back button
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
+
+    //Loop until button is pressed then navigate back to menu
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
@@ -491,8 +544,20 @@ void drawCredits()
     //Fix this - tested intro screens
     
     //LCD.SetFontScale(0.5);
+    //LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
+   
+
+
     
-    /*
+      
+    LCD.SetFontScale(1.0);
+    
+    //Fix this - tested intro screens
+   
+    //LCD.SetFontScale(0.5);
+   
+    //This is test code for the scrolling image 
+    
     scrollImage top[12];
     scrollImage bottom[12];
     int temp = 25;
@@ -505,27 +570,24 @@ void drawCredits()
     }
     while(i < 1000)
     {
-        
+       
+
 
         for(int i = 0; i < 12; i++)
         {
             top[i].nextFrame();
             bottom[i].nextFrame();
         }
-        Sleep(0.5);
+       
+        LCD.Update();
         i++;
     }
-     */
+     
 
+    
     FEHImage credits;
     credits.Open("creditScreen.png");
     credits.Draw(0,0);
-    
-
-    
-      
-    LCD.SetFontScale(1.0);
-    
     
  
     LCD.SetFontColor(WHITE);  
@@ -550,6 +612,10 @@ void drawCredits()
 
 
 //parameter of stats
+/*
+Audrey Malcuit
+finish this comment later once stats are figured out
+*/
 void endScreen()
 {
     LCD.Clear();
