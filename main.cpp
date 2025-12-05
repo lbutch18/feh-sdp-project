@@ -29,10 +29,9 @@ class Player {
     private:
         int lane;
         int x_pos, y_pos;
-        int PLAYER_RADIUS = 10;
         FEHImage image;
-        int SPRITE_W = 40;
-        int SPRITE_H = 40;
+        int SPRITE_W = 35;
+        int SPRITE_H = 35;
     public:
     Player(int inputLane)
     {
@@ -86,6 +85,9 @@ class Player {
     void draw() {
         image.Draw(x_pos, y_pos);
     }
+    int getLane() {
+        return lane;
+    }
 };
 
 class Coin {
@@ -95,14 +97,16 @@ class Coin {
         #define COIN_RADIUS 10
     public:
     // Constructor - lane 1 is top, 2 is center, 3 is bottom
-    Coin(int lane){
-        if (lane == 1){
+    Coin(int laneInput){
+        if (laneInput == 1){
             y_pos = SCREEN_HEIGHT / 4 + COIN_RADIUS;
+            lane = 1;
         }
-        else if (lane == 2){
+        else if (laneInput == 2){
             y_pos = SCREEN_HEIGHT / 2;
+            lane = 1;
         } 
-        else if(lane == 3){
+        else if (laneInput == 3){
             y_pos = 3 * SCREEN_HEIGHT / 4 - COIN_RADIUS;
         }
         x_pos = SCREEN_WIDTH + COIN_RADIUS*2; // Start at right of screen
@@ -120,6 +124,9 @@ class Coin {
     }
     int getXPos(){
         return x_pos;
+    }
+    int getLane(){
+        return lane;
     }
 };
 
@@ -153,7 +160,7 @@ class scrollImage
     }
     void updatePosition()
     {
-        x_pos = x_pos - 5;
+        x_pos = x_pos - PIXELS_PER_FRAME;
         if(x_pos < -50)
         {
             x_pos = 320;
@@ -173,13 +180,16 @@ class Car {
         FEHImage carSprite;
     public:
         static const int CAR_WIDTH = 45;
-    Car(int lane){
-        if (lane == 1){
+    Car(int laneInput) {
+        if (laneInput == 1){
             y_pos = SCREEN_WIDTH / 5;
-        } else if (lane == 2){
+            lane = 1;
+        } else if (laneInput == 2){
             y_pos = SCREEN_WIDTH / 5 + 42;
-        } else if (lane == 3){
+            lane = 2;
+        } else if (laneInput == 3){
             y_pos = SCREEN_WIDTH / 5 + 92;
+            lane = 3;
         }
         x_pos = SCREEN_WIDTH;
 
@@ -196,6 +206,9 @@ class Car {
     int getXPos(){
         return x_pos;
     }
+    int getLane(){
+        return lane;
+    }
 };
 
 class Bus {
@@ -204,13 +217,16 @@ class Bus {
         int x_pos, y_pos;
         FEHImage busSprite;
     public:
-    Bus(int lane){
-        if (lane == 1){
+    Bus(int laneInput){
+        if (laneInput == 1){
             y_pos = SCREEN_WIDTH / 5;
-        } else if (lane == 2){
+            lane = 1;
+        } else if (laneInput == 2){
             y_pos = SCREEN_WIDTH / 5 + 42;
-        } else if (lane == 3){
+            lane = 2;
+        } else if (laneInput == 3){
             y_pos = SCREEN_WIDTH / 5 + 92;
+            lane = 3;
         }
         x_pos = SCREEN_WIDTH;
 
@@ -227,6 +243,9 @@ class Bus {
     }
     int getXPos(){
         return x_pos;
+    }
+    int getLane(){
+        return lane;
     }
 };
 
@@ -365,16 +384,27 @@ void introScreen()
 void nextGameFrame(bool reset){
     // All objects should be declared static so their locations/states are maintained
     // Reminder, the object constructors take in lane number (1 = left, 2 = center, 3 = right)
+    // Count frames for object generating timing
+    static int frameCount = -1;
+    frameCount++;
+
     static std::vector<Coin> coins;
     static std::vector<Car> cars;
     static std::vector<Bus> buses;
 
     static Player player(2);
 
-    // Count frames for object generating timing
-    static int frameCount = -1;
-    frameCount++;
-
+    static scrollImage top[12];
+    static scrollImage bottom[12];
+    int temp = 25;
+    int i = 0;
+    if (frameCount == 0){
+        for (int i = 0; i < 12; i++){
+            top[i] = scrollImage(true, temp);
+            bottom[i] = scrollImage(false, temp);
+            temp += 25;
+        }
+    }   
     // Reset game when coming back from menu
     if (reset) {
         // Recreate all objects
@@ -382,7 +412,6 @@ void nextGameFrame(bool reset){
         coins.clear();
         cars.clear();
         buses.clear();
-        player = Player(2);
     }
 
     // Handle random generation of obstacles/coins
@@ -404,6 +433,12 @@ void nextGameFrame(bool reset){
     }
     for (int i = 0; i < buses.size(); i++) {
         buses[i].updatePosition();
+    }
+    for (int i = 0; i < 12; i++){
+        top[i].updatePosition();
+    }
+    for (int i = 0; i < 12; i++){
+        bottom[i].updatePosition();
     }
     
     /* Move when arrow keys pressed, but can can't move two frames in a row to
@@ -445,6 +480,12 @@ void nextGameFrame(bool reset){
     for (int i = 0; i < buses.size(); i++) {
         buses[i].draw();
     }
+    for (int i = 0; i < 12; i++){
+        top[i].draw();
+    }
+    for (int i = 0; i < 12; i++){
+        bottom[i].draw();
+    }
     
     // Redraw player
     player.draw();
@@ -452,6 +493,38 @@ void nextGameFrame(bool reset){
     // Redraw back button
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
+
+    // Check collisions
+
+    for (int i = 0; i < cars.size(); i++){
+        // Check if car overlaps with player
+        int carLeft = cars[i].getXPos();
+        int carRight = carLeft + Car::CAR_WIDTH;
+        int playerLeft = 5; // Player x position
+        int playerRight = playerLeft + 35; // Add player width
+    
+        // Check X overlap and same lane as car
+        if (carRight > playerLeft && carLeft < playerRight && player.getLane() == cars[i].getLane()){
+            LCD.SetFontColor(RED);
+            LCD.WriteLine("Collision");
+            LCD.SetFontColor(WHITE);
+        }
+    }
+
+    for (int i = 0; i < buses.size(); i++){
+        // Check if bus overlaps with player
+        int busLeft = buses[i].getXPos();
+        int busRight = busLeft + 90; // Bus width
+        int playerLeft = 5; // Player x position
+        int playerRight = playerLeft + 35; // Add player width
+    
+        // Check X overlap and same lane
+        if (busRight > playerLeft && busLeft < playerRight && player.getLane() == buses[i].getLane()){
+            LCD.SetFontColor(RED);
+            LCD.WriteLine("Collision");
+            LCD.SetFontColor(WHITE);
+        }
+    }
 }
 
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
