@@ -7,7 +7,7 @@
 
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
-#define PIXELS_PER_FRAME 5
+#define PIXELS_PER_FRAME 3
 
 void drawMenu();
 void drawPlay();
@@ -316,12 +316,12 @@ void drawPlay()
         // Run game frames until back button is pressed
         while (!LCD.Touch(&x_pos, &y_pos)){
             nextGameFrame(reset);
-            Sleep(100); // Frame rate - should be faster as time goes on eventually
+            Sleep(20); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         while (LCD.Touch(&x_dummy, &y_dummy)){
             nextGameFrame(reset);
-            Sleep(100); // Frame rate - should be faster as time goes on eventually
+            Sleep(20); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         
