@@ -123,6 +123,85 @@ class Coin {
     }
 };
 
+class scrollImage
+{
+    private:
+        boolean top;
+        FEHImage image;
+        int x_pos, y_pos;
+    public:
+    //Will have to create starting images with x as input
+    scrollImage()
+    {
+
+    }
+    scrollImage(boolean top, int x)
+    {
+        if(top)
+        {
+            image.Open("topSideWalk.png");
+            x_pos = x;
+            y_pos = 0;
+        }
+        else
+        {
+            image.Open("bottomSidewalk.png");
+            x_pos = x;
+            y_pos = 192;
+        }
+        image.Draw(x_pos, y_pos);
+    }
+    void nextFrame()
+    {
+        x_pos = x_pos - 5;
+        if(x_pos < 0)
+        {
+            x_pos = 320;
+        }
+        image.Draw(x_pos, y_pos);
+    }
+};
+
+class scrollImage
+{
+    private:
+        boolean top;
+        FEHImage image;
+        int x_pos, y_pos;
+    public:
+    //Will have to create starting images with x as input
+    scrollImage()
+    {
+
+    }
+    scrollImage(boolean top, int x)
+    {
+        if(top)
+        {
+            image.Open("topSideWalk.png");
+            x_pos = x;
+            y_pos = 0;
+        }
+        else
+        {
+            image.Open("bottomSidewalk.png");
+            x_pos = x;
+            y_pos = 192;
+        }
+        image.Draw(x_pos, y_pos);
+    }
+    void nextFrame()
+    {
+        x_pos = x_pos - 5;
+        if(x_pos < 0)
+        {
+            x_pos = 320;
+        }
+        image.Draw(x_pos, y_pos);
+
+    }
+};
+
 class Car {
     private:
         int lane;
@@ -506,12 +585,9 @@ void drawInstructions()
 {
     LCD.Clear();
     LCD.SetFontScale(0.5);
-    LCD.WriteAt("Instructions", 20, 30);
-    LCD.WriteAt("1. Watch the storyline to see how you come to be a", 20, 60);
-    LCD.WriteAt("hero in the middle of a heist!", 20, 90);
-    LCD.WriteAt("2. Begin the chase once the officer catche", 20, 120);
-    LCD.WriteAt("to be a hero and in the middle of a heist!", 20, 150);     
-    LCD.WriteAt("3. Use your keyboard to navigate around obstacles" , 20, 180);
+    FEHImage instructions;
+    instructions.Open("fixed_instructions.png");
+    instructions.Draw(0,0);
 
     
 
@@ -544,9 +620,36 @@ void drawCredits()
     //Fix this - tested intro screens
     
     //LCD.SetFontScale(0.5);
-    //LCD.WriteAt("Made by: Audrey Malcuit and Luke Butcher", 20, 50);
-   
+    
+    /*
+    scrollImage top[12];
+    scrollImage bottom[12];
+    int temp = 25;
+    int i = 0;
+    for(int i = 0; i < 12; i++)
+    {
+            top[i] = scrollImage(true, temp);
+            bottom[i] = scrollImage(false, temp);
+            temp = temp + 25;
+    }
+    while(i < 1000)
+    {
+        
 
+        for(int i = 0; i < 12; i++)
+        {
+            top[i].nextFrame();
+            bottom[i].nextFrame();
+        }
+        Sleep(0.5);
+        i++;
+    }
+     */
+
+    FEHImage credits;
+    credits.Open("creditScreen.png");
+    credits.Draw(0,0);
+    
 
     
       
