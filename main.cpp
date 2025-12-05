@@ -162,46 +162,6 @@ class scrollImage
     }
 };
 
-class scrollImage
-{
-    private:
-        boolean top;
-        FEHImage image;
-        int x_pos, y_pos;
-    public:
-    //Will have to create starting images with x as input
-    scrollImage()
-    {
-
-    }
-    scrollImage(boolean top, int x)
-    {
-        if(top)
-        {
-            image.Open("topSideWalk.png");
-            x_pos = x;
-            y_pos = 0;
-        }
-        else
-        {
-            image.Open("bottomSidewalk.png");
-            x_pos = x;
-            y_pos = 192;
-        }
-        image.Draw(x_pos, y_pos);
-    }
-    void nextFrame()
-    {
-        x_pos = x_pos - 5;
-        if(x_pos < 0)
-        {
-            x_pos = 320;
-        }
-        image.Draw(x_pos, y_pos);
-
-    }
-};
-
 class Car {
     private:
         int lane;
