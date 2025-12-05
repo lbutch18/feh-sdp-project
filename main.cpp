@@ -151,13 +151,17 @@ class scrollImage
         }
         image.Draw(x_pos, y_pos);
     }
-    void nextFrame()
+    void updatePosition()
     {
         x_pos = x_pos - 5;
-        if(x_pos < 0)
+        if(x_pos < -50)
         {
             x_pos = 320;
         }
+        
+    }
+    void draw()
+    {
         image.Draw(x_pos, y_pos);
     }
 };
@@ -588,7 +592,7 @@ void drawCredits()
     
     //LCD.SetFontScale(0.5);
     
-    /*
+    
     scrollImage top[12];
     scrollImage bottom[12];
     int temp = 25;
@@ -605,13 +609,16 @@ void drawCredits()
 
         for(int i = 0; i < 12; i++)
         {
-            top[i].nextFrame();
-            bottom[i].nextFrame();
+            top[i].updatePosition();
+            bottom[i].updatePosition();
+            top[i].draw();
+            bottom[i].draw();
         }
-        Sleep(0.5);
+
+        Sleep(20);
         i++;
     }
-     */
+     
 
     FEHImage credits;
     credits.Open("creditScreen.png");
