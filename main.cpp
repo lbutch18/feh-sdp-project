@@ -7,7 +7,7 @@
 
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
-#define PIXELS_PER_FRAME 3
+#define PIXELS_PER_FRAME 4
 
 void drawMenu();
 void drawPlay();
@@ -18,12 +18,62 @@ void introScreen();
 void nextGameFrame(bool reset);
 void endScreen();
 
+
 // Make compiler happy
 class Coin;
 class Car;
 class Bus;
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses);
 void deleteOffScreenObjects(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses);
+void collectCoin(std::vector<Coin> *coins, int coinID);
+
+class StatTracker {
+    private:
+        int distance;
+        int coins;
+        int score;
+        void updateScore(){
+            score = distance + 50*coins;
+        }
+    public:
+        StatTracker(){
+            distance = 0;
+            coins = 0;
+            score = 0;
+        }
+        void updateDistance(){
+            distance++;
+            updateScore();
+        }
+        int getDistance(){
+            return distance;
+        }
+        void coinCollected(){
+            coins++;
+            updateScore();
+        }
+        int getCoins(){
+            return coins;
+        }
+        int getScore(){
+            return score;
+        }
+        void drawScore(){
+            LCD.SetFontScale(0.5);
+            LCD.WriteAt("Score: ", SCREEN_WIDTH - 80, 50);
+            LCD.WriteAt(score, SCREEN_WIDTH - 42, 50);
+            LCD.SetFontScale(1);
+        }
+        void resetStats(){
+            distance = 0;
+            coins = 0;
+            score = 0;
+        }
+        
+};
+
+//Instantiate this class globally
+StatTracker trackStats = StatTracker();
 
 class Player {
     private:
@@ -104,10 +154,11 @@ class Coin {
         }
         else if (laneInput == 2){
             y_pos = SCREEN_HEIGHT / 2;
-            lane = 1;
+            lane = 2;
         } 
         else if (laneInput == 3){
             y_pos = 3 * SCREEN_HEIGHT / 4 - COIN_RADIUS;
+            lane = 3;
         }
         x_pos = SCREEN_WIDTH + COIN_RADIUS*2; // Start at right of screen
     }
@@ -317,16 +368,7 @@ void drawMenu() {
 void drawPlay()
 {
     LCD.Clear();
-
-    // Draw back button
-    LCD.DrawRectangle(5, 5, 20, 20);
-    LCD.WriteAt("<", 5, 5);
-
-    // Draw lanes - TODO: Replace with dashed lines
-    LCD.DrawLine(0, SCREEN_HEIGHT / 5, SCREEN_WIDTH, SCREEN_HEIGHT / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 2 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 2 / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 3 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 3 / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 4 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 4 / 5);
+    trackStats.resetStats();
 
     //TO DO: Intro screens
 
@@ -339,12 +381,12 @@ void drawPlay()
         // Run game frames until back button is pressed
         while (!LCD.Touch(&x_pos, &y_pos)){
             nextGameFrame(reset);
-            Sleep(20); // Frame rate - should be faster as time goes on eventually
+            Sleep(35); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         while (LCD.Touch(&x_dummy, &y_dummy)){
             nextGameFrame(reset);
-            Sleep(20); // Frame rate - should be faster as time goes on eventually
+            Sleep(35); // Frame rate - should be faster as time goes on eventually
             reset = false;
         }
         
@@ -424,6 +466,7 @@ void nextGameFrame(bool reset){
     // Clear screen to get ready for redraw
     LCD.Clear();
 
+
     // Update positions
     for (int i = 0; i < coins.size(); i++) {
         coins[i].updatePosition();
@@ -440,6 +483,9 @@ void nextGameFrame(bool reset){
     for (int i = 0; i < 12; i++){
         bottom[i].updatePosition();
     }
+
+    // Add to distance every frame
+    trackStats.updateDistance();
     
     /* Move when arrow keys pressed, but can can't move two frames in a row to
     prevent player from basically teleporting*/
@@ -494,7 +540,22 @@ void nextGameFrame(bool reset){
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
 
+    // Draw score
+    trackStats.drawScore();
+
     // Check collisions
+    for (int i = 0; i < coins.size(); i++){
+        // Check if coin overlaps with player
+        int coinLeft = coins[i].getXPos() - 10; // 10 is coin radius
+        int coinRight = coinLeft + 10;
+        int playerLeft = 5; // Player x position
+        int playerRight = playerLeft + 35; // Add player width
+    
+        // Check X overlap and same lane as coin
+        if (coinRight > playerLeft && coinLeft < playerRight && player.getLane() == coins[i].getLane()){
+            collectCoin(&coins, i);
+        }
+    }
 
     for (int i = 0; i < cars.size(); i++){
         // Check if car overlaps with player
@@ -505,9 +566,7 @@ void nextGameFrame(bool reset){
     
         // Check X overlap and same lane as car
         if (carRight > playerLeft && carLeft < playerRight && player.getLane() == cars[i].getLane()){
-            LCD.SetFontColor(RED);
-            LCD.WriteLine("Collision");
-            LCD.SetFontColor(WHITE);
+            endScreen();
         }
     }
 
@@ -520,11 +579,15 @@ void nextGameFrame(bool reset){
     
         // Check X overlap and same lane
         if (busRight > playerLeft && busLeft < playerRight && player.getLane() == buses[i].getLane()){
-            LCD.SetFontColor(RED);
-            LCD.WriteLine("Collision");
-            LCD.SetFontColor(WHITE);
+            endScreen();
         }
     }
+}
+
+
+void collectCoin(std::vector<Coin> *coins, int coinID){
+    (*coins).erase((*coins).begin() + coinID);
+    trackStats.coinCollected();
 }
 
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
@@ -597,7 +660,7 @@ void drawStatistics()
     LCD.DrawRectangle(10, 40, 300, 220);
     LCD.FillRectangle(10, 40, 300, 220);
     LCD.SetFontColor(WHITE);
-    LCD.WriteAt( "Coins Collected: 19", 20, 50);
+    LCD.WriteAt("Coins Collected: 19", 20, 50);
     LCD.WriteAt("Distance traveled: 0 m", 20, 100);
     LCD.WriteAt("Questions Answered", 20, 150);
     LCD.WriteAt("Correctly: 0/0 (0%)", 20, 200);
@@ -737,10 +800,14 @@ void endScreen()
     LCD.FillRectangle(10, 40, 300, 220);
     LCD.SetFontColor(WHITE);
     LCD.WriteAt("Game Over!", 20, 50);
-    LCD.WriteAt( "Coins Collected: 19", 20, 80);
-    LCD.WriteAt("Distance traveled: 0 m", 20, 110);
-    LCD.WriteAt("Questions Answered", 20, 140);
-    LCD.WriteAt("Correctly: 0/0 (0%)", 20, 170);
+    // use c++ string fxns b/c they're better
+    std::string coins = "Coins Collected: ";
+    coins.append(std::to_string(trackStats.getCoins()));
+    LCD.WriteAt(coins, 20, 80);
+    std::string distance = "Distance traveled: ";
+    distance.append(std::to_string(trackStats.getDistance()));
+    LCD.WriteAt(distance, 20, 110);
+    LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 140);
     
     LCD.SetFontColor(WHITE);  
     LCD.DrawRectangle(5, 5, 20, 20);
@@ -751,8 +818,6 @@ void endScreen()
     while(!exit)
     {
         while (!LCD.Touch(&x_pos, &y_pos));
-        while (LCD.Touch(&x_dummy, &y_dummy));
-        while (LCD.Touch(&x_dummy, &y_dummy));
         while (LCD.Touch(&x_dummy, &y_dummy));
          if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
             exit = true;
