@@ -8,7 +8,6 @@
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
 int PIXELS_PER_FRAME = 3;
-int PIXELS_PER_FRAME = 3;
 
 void drawMenu();
 void drawPlay();
@@ -843,7 +842,7 @@ void drawStatistics()
     distance.append(std::to_string(*(trackStats.getMaxDistance())));
     LCD.WriteAt(distance, 20, 110);
     LCD.WriteAt("Score: " + std::to_string(*(trackStats.getMaxScore())), 20, 140);
-    LCD.WriteAt("Time: " + std::to_string(*(trackStats.getMaxTime())), 20, 170);
+    LCD.WriteAt("Time: " + std::to_string(*(trackStats.getMaxTime())) + "s", 20, 170);
     LCD.SetFontScale(1.0);
 
 
@@ -961,7 +960,7 @@ void endScreen()
     LCD.WriteAt(coins, 20, 80);
     std::string distance = "Distance traveled: " + std::to_string(trackStats.getDistance())  + "m";
     LCD.WriteAt(distance, 20, 110);
-    std::string time = "Time: " + std::to_string(*(trackStats.getTime()));
+    std::string time = "Time: " + std::to_string(*(trackStats.getTime())) + "s";
     LCD.WriteAt(time, 20, 140);
     LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 170);
     
