@@ -659,7 +659,8 @@ void nextGameFrame(bool reset){
     trackStats.drawScore();
 
     // Check collisions
-    const int FORGIVENESS = 10;
+    const int CAR_FORGIVENESS = 6;
+    const int BUS_FORGIVENESS = 12;
     for (int i = 0; i < coins.size(); i++){
         // Check if coin overlaps with player
         int coinLeft = coins[i].getXPos() - 10; // 10 is coin radius
@@ -675,8 +676,8 @@ void nextGameFrame(bool reset){
 
     for (int i = 0; i < cars.size(); i++){
         // Check if car overlaps with player
-        int carLeft = cars[i].getXPos() + FORGIVENESS;
-        int carRight = carLeft + Car::CAR_WIDTH - FORGIVENESS;
+        int carLeft = cars[i].getXPos() + CAR_FORGIVENESS;
+        int carRight = carLeft + Car::CAR_WIDTH - 2 * CAR_FORGIVENESS;
         int playerLeft = 5; // Player x position
         int playerRight = playerLeft + 35; // Add player width
     
@@ -689,8 +690,8 @@ void nextGameFrame(bool reset){
 
     for (int i = 0; i < buses.size(); i++){
         // Check if bus overlaps with player
-        int busLeft = buses[i].getXPos() + FORGIVENESS;
-        int busRight = busLeft + 90 - FORGIVENESS; // Bus width
+        int busLeft = buses[i].getXPos() + BUS_FORGIVENESS;
+        int busRight = busLeft + 90 - 2 * BUS_FORGIVENESS; // 90 is Bus width
         int playerLeft = 5; // Player x position
         int playerRight = playerLeft + 35; // Add player width
     
