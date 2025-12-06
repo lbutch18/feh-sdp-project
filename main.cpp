@@ -723,7 +723,8 @@ void drawStatistics()
     LCD.SetFontColor(WHITE);
 
     
-    
+    LCD.WriteAt("Best Run", 20, 50);
+    LCD.SetFontScale(0.75);
     std::string coins = "Coins Collected: ";
     coins.append(std::to_string(*(trackStats.getMaxCoins())));
     LCD.WriteAt(coins, 20, 80);
@@ -731,7 +732,7 @@ void drawStatistics()
     distance.append(std::to_string(*(trackStats.getMaxDistance())));
     LCD.WriteAt(distance, 20, 110);
     LCD.WriteAt("Score: " + std::to_string(*(trackStats.getMaxScore())), 20, 140);
-    
+    LCD.SetFontScale(1.0);
 
 
     float x_pos, y_pos, x_dummy, y_dummy;
