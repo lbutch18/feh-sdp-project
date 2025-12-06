@@ -544,7 +544,7 @@ void drawPlay()
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     bool reset = true; // To reset game state on first frame after entering from menu
-    int FRAME_RATE = 10; // Set frame redraw time to 10 ms
+    int FRAME_RATE = 6; // Set frame redraw time to 10 ms
     int frameCount = 0; // Need to keep track of frame count to determine when to speed up
     PIXELS_PER_FRAME = 3;
     int* startTime = trackStats.getstartTime();
