@@ -7,7 +7,7 @@
 
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
-#define PIXELS_PER_FRAME 4
+int PIXELS_PER_FRAME = 3;
 
 void drawMenu();
 void drawPlay();
@@ -375,19 +375,30 @@ void drawPlay()
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     bool reset = true; // To reset game state on first frame after entering from menu
+    int FRAME_RATE = 10; // Set frame redraw time to 10 ms
+    int frameCount = 0; // Need to keep track of frame count to determine when to speed up
+    PIXELS_PER_FRAME = 3;
   
     while(!exit)
     {
         // Run game frames until back button is pressed
         while (!LCD.Touch(&x_pos, &y_pos)){
             nextGameFrame(reset);
-            Sleep(35); // Frame rate - should be faster as time goes on eventually
+            Sleep(FRAME_RATE); // Frame rate - should be faster as time goes on eventually
             reset = false;
+            frameCount++;
+            if (frameCount % 500 == 0){ // Increase pixels per frame every so often to increase difficulty
+                PIXELS_PER_FRAME++;
+            }
         }
         while (LCD.Touch(&x_dummy, &y_dummy)){
             nextGameFrame(reset);
-            Sleep(35); // Frame rate - should be faster as time goes on eventually
+            Sleep(FRAME_RATE); // Frame rate - should be faster as time goes on eventually
             reset = false;
+            frameCount++;
+            if (frameCount % 500 == 0){ // Increase pixels per frame every so often to increase difficulty
+                PIXELS_PER_FRAME++;
+            }
         }
         
         if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
@@ -591,41 +602,41 @@ void collectCoin(std::vector<Coin> *coins, int coinID){
 }
 
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
-    // Track if bus was last so we know not to generate a vehicle again right after
-    static int busLast = 0;
-    static int lastCoinLane;
+    // Track if we need to skip obstacle generation this row
+    static int skipObstacleRows = 0;
+    static int lastCoinLane = 2;
+    // Track last bus lane for coin generation
+    static int lastBusLane = 0;
 
-    if (busLast == 0) {
-        // Generate coin in any lane
-        int coinLane = (Random.RandInt())/10923 + 1; // Give random int from one to 3
-        (*coins).push_back(Coin(coinLane));
-        lastCoinLane = coinLane;
+    // Always generate a coin
+    int coinLane = (Random.RandInt()) / 10923 + 1;
+    while (coinLane == lastBusLane){
+        coinLane = (Random.RandInt()) / 10923 + 1;
+    }
+    (*coins).push_back(Coin(coinLane));
+    lastCoinLane = coinLane;
 
-        int obstacleLane = (Random.RandInt())/10923 + 1;
-        // Make sure obstacle is not in same lane as coin
-        while (obstacleLane == coinLane){
-            obstacleLane = (Random.RandInt())/10923 + 1;
-        }
+    // Check if obstacle generation is skipped
+    if (skipObstacleRows > 0) {
+        skipObstacleRows--;
+        lastBusLane = 0; // Can reset this because coin can no longer spawn on top of bus
+        return;
+    }
 
-        int obstacleType = (Random.RandInt())/16383;
-        if (obstacleType == 0){
-            (*cars).push_back(Car(obstacleLane));
-        }else{
-            (*buses).push_back(Bus(obstacleLane));
-            busLast++;
-        }
-    } else if (busLast == 1) {
-        // Generate coin in the last lane it was in
-        (*coins).push_back(Coin(lastCoinLane));
-        busLast++;
-    } else if (busLast == 2){
-        // Generate coin in any lane
-        int coinLane = (Random.RandInt())/10923 + 1; // Give random int from one to 3
-        (*coins).push_back(Coin(coinLane));
-        lastCoinLane = coinLane;
+    // Generate an obstacle in a different lane than the coin
+    int obstacleLane = (Random.RandInt()) / 10923 + 1;
+    while (obstacleLane == coinLane) {
+        obstacleLane = (Random.RandInt()) / 10923 + 1;
+    }
 
-        // Reset busLast
-        busLast = 0;
+    int obstacleType = (Random.RandInt()) / 16383;
+    if (obstacleType == 0) {
+        (*cars).push_back(Car(obstacleLane));
+        skipObstacleRows = 1; // Skip next row
+    } else {
+        (*buses).push_back(Bus(obstacleLane));
+        skipObstacleRows = 2; // Bus is wider, skip 2 rows
+        lastBusLane = obstacleLane;
     }
 }
 
@@ -804,8 +815,7 @@ void endScreen()
     std::string coins = "Coins Collected: ";
     coins.append(std::to_string(trackStats.getCoins()));
     LCD.WriteAt(coins, 20, 80);
-    std::string distance = "Distance traveled: ";
-    distance.append(std::to_string(trackStats.getDistance()));
+    std::string distance = "Distance traveled: " + std::to_string(trackStats.getDistance())  + "m";
     LCD.WriteAt(distance, 20, 110);
     LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 140);
     
