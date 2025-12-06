@@ -166,17 +166,17 @@ class Player {
         x_pos = 5; // Start at left
         if (inputLane == 1){
             lane = 1;
-            y_pos = 50;
+            y_pos = 54;
             image.Draw(x_pos, y_pos);
         }
         else if (inputLane == 2){
             lane = 2;
-            y_pos =  98;
+            y_pos =  102;
             image.Draw(x_pos, y_pos);
         } 
         else if(inputLane == 3){
             lane = 3;
-            y_pos = 146;
+            y_pos = 150;
             image.Draw(x_pos, y_pos);
         }
     }
@@ -187,12 +187,12 @@ class Player {
         if(lane == 2)
         {
             lane = 1;
-            y_pos = 50;
+            y_pos = 54;
         }
         else if(lane == 3)
         {
             lane = 2;
-            y_pos = 98;
+            y_pos = 102;
         } 
     }
     void moveDown()
@@ -200,12 +200,12 @@ class Player {
         if(lane == 2)
         {
             lane = 3;
-            y_pos = 146;
+            y_pos = 150;
         }
         else if(lane == 1)
         {
             lane = 2;
-            y_pos = 98;
+            y_pos = 102;
         } 
     }
     // Redraw player each frame
@@ -334,13 +334,13 @@ class Car {
         static const int CAR_WIDTH = 45;
     Car(int laneInput) {
         if (laneInput == 1){
-            y_pos = SCREEN_WIDTH / 5;
+            y_pos = 59;
             lane = 1;
         } else if (laneInput == 2){
-            y_pos = SCREEN_WIDTH / 5 + 42;
+            y_pos = 107;
             lane = 2;
         } else if (laneInput == 3){
-            y_pos = SCREEN_WIDTH / 5 + 92;
+            y_pos = 155;
             lane = 3;
         }
         x_pos = SCREEN_WIDTH;
@@ -371,13 +371,13 @@ class Bus {
     public:
     Bus(int laneInput){
         if (laneInput == 1){
-            y_pos = SCREEN_WIDTH / 5;
+            y_pos = 54;
             lane = 1;
         } else if (laneInput == 2){
-            y_pos = SCREEN_WIDTH / 5 + 42;
+            y_pos = 102;
             lane = 2;
         } else if (laneInput == 3){
-            y_pos = SCREEN_WIDTH / 5 + 92;
+            y_pos = 150;
             lane = 3;
         }
         x_pos = SCREEN_WIDTH;
@@ -704,11 +704,11 @@ void nextGameFrame(bool reset){
 
 // Handle collision animations
 void drawCollision(int collisionXPos, int collisionLane){
-    int yPos = SCREEN_HEIGHT / 5;
+    int yPos = 51;
     if (collisionLane == 2){
-        yPos = 2 * SCREEN_HEIGHT / 5;
+        yPos = 99;
     } else if (collisionLane == 3){
-        yPos = 3 * SCREEN_HEIGHT / 5;
+        yPos = 147;
     }
 
     FEHImage frames[8];
