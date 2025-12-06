@@ -4,10 +4,18 @@
 #include <FEHKeyboard.h>
 #include <FEHRandom.h>
 #include <FEHSound.h>
+#include <windows.h>
 
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
 int PIXELS_PER_FRAME = 3;
+
+FEHSound collision("8-bit-explosion-10-340462.wav");
+FEHSound coinCollect("retro-coin-4-236671.wav");
+FEHSound menuMusic("menu-music.wav");
+FEHSound gameMusic("game-music.wav");
+FEHSound farMusic("far-music.wav");
+
 
 void drawMenu();
 void drawPlay();
@@ -439,6 +447,11 @@ int main()
 }
 
 void drawMenu() {
+    menuMusic.setVolume(0.5);
+    menuMusic.play();
+    gameMusic.pause();
+    farMusic.pause();
+
     LCD.Clear();
     int boxWidth = SCREEN_WIDTH / 1.5;
     int boxHeight = SCREEN_HEIGHT / 8;
@@ -536,8 +549,14 @@ void drawPlay()
     PIXELS_PER_FRAME = 3;
     int* startTime = trackStats.getstartTime();
     *(startTime) = TimeNow();
+    
+    gameMusic.setVolume(0.5);
+    menuMusic.pause();
+    farMusic.pause();
+    gameMusic.play();
     while(!exit)
     {
+        
         // Run game frames until back button is pressed
         while (!LCD.Touch(&x_pos, &y_pos)){
             nextGameFrame(reset);
@@ -748,6 +767,12 @@ void nextGameFrame(bool reset){
         bottom2 = scrollImage(false, SCREEN_WIDTH);
     }
 
+    // Easter egg music if you go far enough
+    if (frameCount == 2095){
+        farMusic.setVolume(0.5);
+        farMusic.play();
+    }
+
     // Handle random generation of obstacles/coins
     // Every time a row of objects moves a car's width, generate new row
     // I don't like C :( - why can't I use the dot operator with static variables?
@@ -878,9 +903,10 @@ void nextGameFrame(bool reset){
     *(tempTime) = TimeNow() - *(trackStats.getstartTime());
 }
 
-FEHSound collision("8-bit-explosion-10-340462.wav");
 // Handle collision animations
 void drawCollision(int collisionLane){
+    collision.play();
+
     int yPos = 51;
     if (collisionLane == 2){
         yPos = 99;
@@ -894,11 +920,25 @@ void drawCollision(int collisionLane){
         frames[i].Draw(5, yPos); // is 5 so centered on player
         Sleep(75);
     }
-    collision.play();
+}
+
+
+// Need to use threading because .play() isn't fully async
+DWORD WINAPI playSoundThread(LPVOID lpParam) {
+    FEHSound* sound = static_cast<FEHSound*>(lpParam);
+    sound->play();
+    return 0;
 }
 
 void collectCoin(std::vector<Coin> *coins, int coinID){
     (*coins).erase((*coins).begin() + coinID);
+    
+    // Create thread to play sound without blocking
+    HANDLE hThread = CreateThread(NULL, 0, playSoundThread, (LPVOID)&coinCollect, 0, NULL);
+    if (hThread != NULL) {
+        CloseHandle(hThread); // Release handle, thread continues
+    }
+    
     trackStats.coinCollected();
 }
 
