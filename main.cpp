@@ -32,10 +32,12 @@ class StatTracker {
         int distance;
         int coins;
         int score;
+        int time;
         int maxDistance;
         int maxCoins;
         int maxScore;
-        
+        int maxTime;
+        int startTime;
         void updateScore(){
             score = distance + 50*coins;
         }
@@ -52,6 +54,12 @@ class StatTracker {
         int getDistance(){
             return distance;
         }
+        int* getTime(){
+            return &time;
+        }
+        int* getstartTime(){
+            return &startTime;
+        }
         void coinCollected(){
             coins++;
             updateScore();
@@ -65,13 +73,15 @@ class StatTracker {
         int* getMaxDistance(){
             return &maxDistance;
         }
+        int* getMaxTime(){
+            return &maxTime;
+        }
         int* getMaxCoins(){
             return &maxCoins;
         }
         int* getMaxScore(){
             return &maxScore;
         }
-
         void drawScore(){
             LCD.SetFontScale(0.5);
             LCD.WriteAt("Score: ", SCREEN_WIDTH - 80, 50);
@@ -82,10 +92,12 @@ class StatTracker {
             distance = 0;
             coins = 0;
             score = 0;
+            time = 0;
         }
         
 };
 
+       
 static void updateMaxDistance(int d, int* max)
 {
     if(d > *(max))
@@ -110,7 +122,14 @@ static void updateMaxScore(int s, int* max)
     }
           
 }
-
+static void updateMaxTime(int t, int* max)
+{
+    if(t > *(max))
+    {
+        *(max) = t;
+    }
+          
+}
 
 //Instantiate this class globally
 StatTracker trackStats = StatTracker();
@@ -424,7 +443,8 @@ void drawPlay()
     int FRAME_RATE = 10; // Set frame redraw time to 10 ms
     int frameCount = 0; // Need to keep track of frame count to determine when to speed up
     PIXELS_PER_FRAME = 3;
-  
+    int* startTime = trackStats.getstartTime();
+    *(startTime) = TimeNow();
     while(!exit)
     {
         // Run game frames until back button is pressed
@@ -499,6 +519,8 @@ void nextGameFrame(bool reset){
     static scrollImage bottom2;
     int temp = 25;
     int i = 0;
+    int startTime = 0;
+    int* start = trackStats.getstartTime();
     if (frameCount == 0){
         top1 = scrollImage(true, 0);
         top2 = scrollImage(true, SCREEN_WIDTH);
@@ -594,14 +616,7 @@ void nextGameFrame(bool reset){
     for (int i = 0; i < buses.size(); i++) {
         buses[i].draw();
     }
-    /*
-    for (int i = 0; i < 12; i++){
-        top[i].draw();
-    }
-    for (int i = 0; i < 12; i++){
-        bottom[i].draw();
-    }
-        */
+  
     
     // Redraw player
     player.draw();
@@ -652,6 +667,11 @@ void nextGameFrame(bool reset){
             endScreen();
         }
     }
+
+    int* tempTime = trackStats.getTime();
+    *(tempTime) = TimeNow() - *(trackStats.getstartTime());
+
+
 }
 
 
@@ -730,12 +750,20 @@ void drawStatistics()
     LCD.DrawRectangle(10, 40, 300, 220);
     LCD.FillRectangle(10, 40, 300, 220);
     LCD.SetFontColor(WHITE);
-    LCD.WriteAt("Coins Collected: 19", 20, 50);
-    LCD.WriteAt("Distance traveled: 0 m", 20, 100);
-    LCD.WriteAt("Questions Answered", 20, 150);
-    LCD.WriteAt("Correctly: 0/0 (0%)", 20, 200);
+
     
-    
+    LCD.WriteAt("Best Run", 20, 50);
+    LCD.SetFontScale(0.75);
+    std::string coins = "Coins Collected: ";
+    coins.append(std::to_string(*(trackStats.getMaxCoins())));
+    LCD.WriteAt(coins, 20, 80);
+    std::string distance = "Distance traveled: ";
+    distance.append(std::to_string(*(trackStats.getMaxDistance())));
+    LCD.WriteAt(distance, 20, 110);
+    LCD.WriteAt("Score: " + std::to_string(*(trackStats.getMaxScore())), 20, 140);
+    LCD.WriteAt("Time: " + std::to_string(*(trackStats.getMaxTime())), 20, 170);
+    LCD.SetFontScale(1.0);
+
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
@@ -851,7 +879,11 @@ void endScreen()
     LCD.WriteAt(coins, 20, 80);
     std::string distance = "Distance traveled: " + std::to_string(trackStats.getDistance())  + "m";
     LCD.WriteAt(distance, 20, 110);
-    LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 140);
+    std::string time = "Time: " + std::to_string(*(trackStats.getTime()));
+    LCD.WriteAt(time, 20, 140);
+    LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 170);
+    
+    updateMaxTime(*(trackStats.getTime()), trackStats.getMaxTime());
     updateMaxDistance(trackStats.getDistance(), trackStats.getMaxDistance());
     updateMaxScore(trackStats.getScore(), trackStats.getMaxScore());
     updateMaxCoins(trackStats.getCoins(), trackStats.getMaxCoins());
