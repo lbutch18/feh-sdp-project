@@ -3,7 +3,7 @@
 #include <FEHUtility.h>
 #include <FEHKeyboard.h>
 #include <FEHRandom.h>
-
+#include <FEHSound.h>
 
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
@@ -878,6 +878,7 @@ void nextGameFrame(bool reset){
     *(tempTime) = TimeNow() - *(trackStats.getstartTime());
 }
 
+FEHSound collision("8-bit-explosion-10-340462.wav");
 // Handle collision animations
 void drawCollision(int collisionLane){
     int yPos = 51;
@@ -888,6 +889,7 @@ void drawCollision(int collisionLane){
     }
 
     FEHImage frames[8];
+    collision.play();
     for (int i = 0; i < 8; i++){
         frames[i].Open(("crash" + std::to_string(i+1) + ".png").c_str()); //c_str converts to char array
         frames[i].Draw(5, yPos); // is 5 so centered on player
