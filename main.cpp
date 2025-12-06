@@ -742,6 +742,10 @@ void nextGameFrame(bool reset){
         coins.clear();
         cars.clear();
         buses.clear();
+        top1 = scrollImage(true, 0);
+        top2 = scrollImage(true, SCREEN_WIDTH);
+        bottom1 = scrollImage(false, 0);
+        bottom2 = scrollImage(false, SCREEN_WIDTH);
     }
 
     // Handle random generation of obstacles/coins
