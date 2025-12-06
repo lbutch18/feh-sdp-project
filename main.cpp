@@ -561,10 +561,18 @@ void introScreen()
     first.Open("Evil Money Guy Updated2.png");
     first.Draw(0,0);
 
-   
-
-
     Sleep(2.5);
+    int rad = 0;
+    LCD.SetFontColor(WHITE);
+    while (rad < SCREEN_WIDTH){
+        LCD.FillCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, rad);
+        rad += 2; // arbitrary
+        Sleep(1);
+    }
+    LCD.SetFontColor(BLACK);
+
+
+
     FEHImage second;
     second.Open("Planning Guy Updated.png");
     second.Draw(0,0);
