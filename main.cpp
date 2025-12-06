@@ -15,8 +15,10 @@ void drawStatistics();
 void drawInstructions();
 void drawCredits();
 void introScreen();
+void animateBetweenButton(float x, float y);
 void nextGameFrame(bool reset);
 void endScreen();
+void drawCollision(int );
 void drawCollision(int );
 
 
@@ -476,21 +478,40 @@ void drawMenu() {
         if (x_pos > SCREEN_WIDTH / 2 - boxWidth / 2 && x_pos < SCREEN_WIDTH / 2 + boxWidth / 2) {
             if (y_pos > 50 && y_pos < 50 + boxHeight) {
                 boxTouched = true;
+                animateBetweenButton(x_pos, y_pos);
                 drawPlay();
             }
             else if (y_pos > 100 && y_pos < 100 + boxHeight) {
                 boxTouched = true;
+                animateBetweenButton(x_pos, y_pos);
                 drawInstructions();
             }
             else if (y_pos > 150 && y_pos < 150 + boxHeight) {
+                animateBetweenButton(x_pos, y_pos);
                 boxTouched = true;
                 drawStatistics();
             } else if (y_pos > 200 && y_pos < 200 + boxHeight) {
+                animateBetweenButton(x_pos, y_pos);
                 boxTouched = true;
                 drawCredits();
             }
         }
     }
+}
+
+void animateBetweenButton(float x, float y)
+{
+    
+    float centerX = x;
+    float centerY = y;
+    int rad = 0;
+    LCD.SetFontColor(WHITE);
+    while (rad < SCREEN_WIDTH){
+        LCD.FillCircle(centerX, centerY, rad);
+        rad += 2; // arbitrary
+        Sleep(1);
+    }
+    LCD.SetFontColor(BLACK);
 }
 
 void drawPlay()
@@ -542,9 +563,14 @@ void drawPlay()
 void introScreen()
 {
     LCD.Clear();
+    
     FEHImage first;
     first.Open("Evil Money Guy Updated2.png");
     first.Draw(0,0);
+
+   
+
+
     Sleep(2.5);
     int rad = 0;
     LCD.SetFontColor(WHITE);
@@ -560,8 +586,10 @@ void introScreen()
     FEHImage second;
     second.Open("Planning Guy Updated.png");
     second.Draw(0,0);
+    
 
     Sleep(2.5);
+    LCD.SetFontColor(BLACK);
     FEHImage third;
     third.Open("Heist Happening Updated 1.png");
     third.Draw(0,0);
