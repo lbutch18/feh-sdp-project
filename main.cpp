@@ -32,6 +32,9 @@ class StatTracker {
         int distance;
         int coins;
         int score;
+        int maxDistance;
+        int maxCoins;
+        int maxScore;
         void updateScore(){
             score = distance + 50*coins;
         }
@@ -58,6 +61,15 @@ class StatTracker {
         int getScore(){
             return score;
         }
+        int* getMaxDistance(){
+            return &maxDistance;
+        }
+        int* getMaxCoins(){
+            return &maxCoins;
+        }
+        int* getMaxScore(){
+            return &maxScore;
+        }
         void drawScore(){
             LCD.SetFontScale(0.5);
             LCD.WriteAt("Score: ", SCREEN_WIDTH - 80, 50);
@@ -71,6 +83,32 @@ class StatTracker {
         }
         
 };
+
+       
+static void updateMaxDistance(int d, int* max)
+{
+    if(d > *(max))
+    {
+        *(max) = d;
+    }
+          
+}
+static void updateMaxCoins(int c, int* max)
+{
+    if(c > *(max))
+    {
+        *(max) = c;
+    }
+          
+}
+static void updateMaxScore(int s, int* max)
+{
+    if(s > *(max))
+    {
+        *(max) = s;
+    }
+          
+}
 
 //Instantiate this class globally
 StatTracker trackStats = StatTracker();
@@ -543,14 +581,7 @@ void nextGameFrame(bool reset){
     for (int i = 0; i < buses.size(); i++) {
         buses[i].draw();
     }
-    /*
-    for (int i = 0; i < 12; i++){
-        top[i].draw();
-    }
-    for (int i = 0; i < 12; i++){
-        bottom[i].draw();
-    }
-        */
+  
     
     // Redraw player
     player.draw();
@@ -679,12 +710,18 @@ void drawStatistics()
     LCD.DrawRectangle(10, 40, 300, 220);
     LCD.FillRectangle(10, 40, 300, 220);
     LCD.SetFontColor(WHITE);
-    LCD.WriteAt("Coins Collected: 19", 20, 50);
-    LCD.WriteAt("Distance traveled: 0 m", 20, 100);
-    LCD.WriteAt("Questions Answered", 20, 150);
-    LCD.WriteAt("Correctly: 0/0 (0%)", 20, 200);
+
     
     
+    std::string coins = "Coins Collected: ";
+    coins.append(std::to_string(*(trackStats.getMaxCoins())));
+    LCD.WriteAt(coins, 20, 80);
+    std::string distance = "Distance traveled: ";
+    distance.append(std::to_string(*(trackStats.getMaxDistance())));
+    LCD.WriteAt(distance, 20, 110);
+    LCD.WriteAt("Score: " + std::to_string(*(trackStats.getMaxScore())), 20, 140);
+    
+
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
@@ -803,6 +840,10 @@ void endScreen()
     LCD.WriteAt(distance, 20, 110);
     LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 140);
     
+    updateMaxDistance(trackStats.getDistance(), trackStats.getMaxDistance());
+    updateMaxScore(trackStats.getScore(), trackStats.getMaxScore());
+    updateMaxCoins(trackStats.getCoins(), trackStats.getMaxCoins());
+
     LCD.SetFontColor(WHITE);  
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
