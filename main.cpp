@@ -563,41 +563,135 @@ void drawPlay()
 void introScreen()
 {
     LCD.Clear();
-    
-    FEHImage first;
-    first.Open("Evil Money Guy Updated2.png");
-    first.Draw(0,0);
 
-   
+    FEHImage introI;
+    introI.Open("introInstructionsUpdated.png");
+    introI.Draw(0,0);
+    bool end = false;
 
-
-    Sleep(2.5);
-    int rad = 0;
-    LCD.SetFontColor(WHITE);
-    while (rad < SCREEN_WIDTH){
-        LCD.FillCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, rad);
-        rad += 2; // arbitrary
-        Sleep(1);
+    int introTime = TimeNow();
+    float dummyx = 0;
+    float dummyy = 0;
+    bool space = false;
+    bool any = false;
+    while(TimeNow() - introTime < 5 && !LCD.Touch(&dummyx, &dummyy) && (!space && !any))
+    {
+        if(Keyboard.isPressed(KEY_SPACE))
+        {
+            space = true;
+        }
+        else if(Keyboard.areAnyPressed())
+        {
+            any = true;
+        }
     }
-    LCD.SetFontColor(BLACK);
+    any = false;
 
+    while(!Keyboard.isPressed(KEY_SPACE) && !end && !space)
+    {
 
-
-    FEHImage second;
-    second.Open("Planning Guy Updated.png");
-    second.Draw(0,0);
+        
+        float dummyx = 0;
+        float dummyy = 0;
+        Sleep(300);
+        FEHImage first;
+        first.Open("Evil Money Guy Updated2.png");
+        first.Draw(0,0);
+        int start1 = TimeNow();
+        while(TimeNow() - start1 < 5 && !space && !any && !LCD.Touch(&dummyx, &dummyy))
+        {
+            if(Keyboard.isPressed(KEY_SPACE))
+            {
+                space = true;
+                break;
+            }
+            else if(Keyboard.areAnyPressed())
+            {
+                any = true;
+            }
+        }
+        if(space)
+        {
+            break;
+        }
+        any = false;
     
 
-    Sleep(2.5);
-    LCD.SetFontColor(BLACK);
-    FEHImage third;
-    third.Open("Heist Happening Updated 1.png");
-    third.Draw(0,0);
+        LCD.SetFontColor(BLACK);
 
-    Sleep(2.5);
-    FEHImage fourth;
-    fourth.Open("Final Intro Screen Updated.png");
-    fourth.Draw(0,0);
+
+        Sleep(300);
+        FEHImage second;
+        second.Open("Planning Guy Updated.png");
+        second.Draw(0,0);
+        int start2 = TimeNow();
+        while(TimeNow() - start2 < 5 && !space && !any && !LCD.Touch(&dummyx, &dummyy))
+        {
+            if(Keyboard.isPressed(KEY_SPACE))
+            {
+                space = true;
+                break;
+            }
+            else if(Keyboard.areAnyPressed())
+            {
+                any = true;
+            }
+        }
+        if(space)
+        {
+            break;
+        }
+        any = false;
+
+        Sleep(300);
+        
+        LCD.SetFontColor(BLACK);
+        FEHImage third;
+        third.Open("Heist Happening Updated 1.png");
+        third.Draw(0,0);
+        int start3 = TimeNow();
+        while(TimeNow() - start3 < 5 && !space && !any && !LCD.Touch(&dummyx, &dummyy))
+        {
+            if(Keyboard.isPressed(KEY_SPACE))
+            {
+                space = true;
+                break;
+            }
+            else if(Keyboard.areAnyPressed())
+            {
+                any = true;
+            }
+        }
+        if(space)
+        {
+            break;
+        }
+
+        any = false;
+        Sleep(300);
+        FEHImage fourth;
+        fourth.Open("Final Intro Screen Updated.png");
+        fourth.Draw(0,0);
+        int start4 = TimeNow();
+        while(TimeNow() - start4 < 5 && !space && !any && !LCD.Touch(&dummyx, &dummyy))
+        {
+            if(Keyboard.isPressed(KEY_SPACE))
+            {
+                space = true;
+                break;
+            }
+            else if(Keyboard.areAnyPressed())
+            {
+                any = true;
+            }
+        }
+        if(space)
+        {
+            break;
+        }
+        end = true;
+    }
+    
 
 }
 
