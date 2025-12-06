@@ -8,6 +8,7 @@
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
 int PIXELS_PER_FRAME = 3;
+int PIXELS_PER_FRAME = 3;
 
 void drawMenu();
 void drawPlay();
@@ -33,9 +34,12 @@ class StatTracker {
         int distance;
         int coins;
         int score;
+        int time;
         int maxDistance;
         int maxCoins;
         int maxScore;
+        int maxTime;
+        int startTime;
         void updateScore(){
             score = distance + 50*coins;
         }
@@ -52,6 +56,12 @@ class StatTracker {
         int getDistance(){
             return distance;
         }
+        int* getTime(){
+            return &time;
+        }
+        int* getstartTime(){
+            return &startTime;
+        }
         void coinCollected(){
             coins++;
             updateScore();
@@ -64,6 +74,9 @@ class StatTracker {
         }
         int* getMaxDistance(){
             return &maxDistance;
+        }
+        int* getMaxTime(){
+            return &maxTime;
         }
         int* getMaxCoins(){
             return &maxCoins;
@@ -81,6 +94,7 @@ class StatTracker {
             distance = 0;
             coins = 0;
             score = 0;
+            time = 0;
         }
         
 };
@@ -106,6 +120,14 @@ static void updateMaxScore(int s, int* max)
     if(s > *(max))
     {
         *(max) = s;
+    }
+          
+}
+static void updateMaxTime(int t, int* max)
+{
+    if(t > *(max))
+    {
+        *(max) = t;
     }
           
 }
@@ -479,7 +501,8 @@ void drawPlay()
     int FRAME_RATE = 10; // Set frame redraw time to 10 ms
     int frameCount = 0; // Need to keep track of frame count to determine when to speed up
     PIXELS_PER_FRAME = 3;
-  
+    int* startTime = trackStats.getstartTime();
+    *(startTime) = TimeNow();
     while(!exit)
     {
         // Run game frames until back button is pressed
@@ -494,7 +517,7 @@ void drawPlay()
         }
         while (LCD.Touch(&x_dummy, &y_dummy)){
             nextGameFrame(reset);
-            Sleep(FRAME_RATE); // Frame rate - should be faster as time goes on eventually
+            Sleep(FRAME_RATE);
             reset = false;
             frameCount++;
             if (frameCount % 500 == 0){ // Increase pixels per frame every so often to increase difficulty
@@ -564,6 +587,8 @@ void nextGameFrame(bool reset){
     static scrollImage bottom2;
     int temp = 25;
     int i = 0;
+    int startTime = 0;
+    int* start = trackStats.getstartTime();
     if (frameCount == 0){
         top1 = scrollImage(true, 0);
         top2 = scrollImage(true, SCREEN_WIDTH);
@@ -711,6 +736,8 @@ void nextGameFrame(bool reset){
             endScreen();
         }
     }
+    int* tempTime = trackStats.getTime();
+    *(tempTime) = TimeNow() - *(trackStats.getstartTime());
 }
 
 // Handle collision animations
@@ -816,6 +843,7 @@ void drawStatistics()
     distance.append(std::to_string(*(trackStats.getMaxDistance())));
     LCD.WriteAt(distance, 20, 110);
     LCD.WriteAt("Score: " + std::to_string(*(trackStats.getMaxScore())), 20, 140);
+    LCD.WriteAt("Time: " + std::to_string(*(trackStats.getMaxTime())), 20, 170);
     LCD.SetFontScale(1.0);
 
 
@@ -933,8 +961,11 @@ void endScreen()
     LCD.WriteAt(coins, 20, 80);
     std::string distance = "Distance traveled: " + std::to_string(trackStats.getDistance())  + "m";
     LCD.WriteAt(distance, 20, 110);
-    LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 140);
+    std::string time = "Time: " + std::to_string(*(trackStats.getTime()));
+    LCD.WriteAt(time, 20, 140);
+    LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 170);
     
+    updateMaxTime(*(trackStats.getTime()), trackStats.getMaxTime());
     updateMaxDistance(trackStats.getDistance(), trackStats.getMaxDistance());
     updateMaxScore(trackStats.getScore(), trackStats.getMaxScore());
     updateMaxCoins(trackStats.getCoins(), trackStats.getMaxCoins());
