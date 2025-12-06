@@ -182,7 +182,7 @@ class Player {
         int SPRITE_W = 35;
         int SPRITE_H = 35;
         int frameCount;
-        FEHImage frames[7];
+        FEHImage frames[8];
     public:
     Player(int inputLane)
     {
@@ -201,7 +201,7 @@ class Player {
             y_pos = 150;
         }
 
-        for (int i = 0; i < 7; i++){
+        for (int i = 0; i < 8; i++){
             frames[i].Open(("player_run_frame_" + std::to_string(i + 1) + ".png").c_str()); // Open each frame
         }
     }
@@ -237,7 +237,7 @@ class Player {
     void draw() {
         frames[frameCount].Draw(x_pos, y_pos);
         frameCount++;
-        if (frameCount >= 7){
+        if (frameCount >= 8){
             frameCount = 0; // reset frame count
         }
     }
