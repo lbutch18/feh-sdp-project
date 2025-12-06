@@ -889,12 +889,12 @@ void drawCollision(int collisionLane){
     }
 
     FEHImage frames[8];
-    collision.play();
     for (int i = 0; i < 8; i++){
         frames[i].Open(("crash" + std::to_string(i+1) + ".png").c_str()); //c_str converts to char array
         frames[i].Draw(5, yPos); // is 5 so centered on player
         Sleep(75);
     }
+    collision.play();
 }
 
 void collectCoin(std::vector<Coin> *coins, int coinID){
