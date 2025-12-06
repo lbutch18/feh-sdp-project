@@ -216,9 +216,9 @@ class scrollImage
     void updatePosition()
     {
         x_pos = x_pos - PIXELS_PER_FRAME;
-        if(x_pos < -310)
+        if(x_pos < -309)
         {
-            x_pos = 320;
+            x_pos = SCREEN_WIDTH;
         }
         
     }
@@ -461,9 +461,9 @@ void nextGameFrame(bool reset){
     int i = 0;
     if (frameCount == 0){
         top1 = scrollImage(true, 0);
-        top2 = scrollImage(true, 320);
+        top2 = scrollImage(true, SCREEN_WIDTH);
         bottom1 = scrollImage(false, 0);
-        bottom2 = scrollImage(false, 320);
+        bottom2 = scrollImage(false, SCREEN_WIDTH);
         top1.draw();
         top2.draw();
         bottom1.draw();
