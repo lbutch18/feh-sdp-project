@@ -17,7 +17,7 @@ void drawCredits();
 void introScreen();
 void nextGameFrame(bool reset);
 void endScreen();
-void drawCollision(int , int );
+void drawCollision(int );
 
 
 // Make compiler happy
@@ -659,7 +659,7 @@ void nextGameFrame(bool reset){
     trackStats.drawScore();
 
     // Check collisions
-    const int FORGIVENESS = 8;
+    const int FORGIVENESS = 10;
     for (int i = 0; i < coins.size(); i++){
         // Check if coin overlaps with player
         int coinLeft = coins[i].getXPos() - 10; // 10 is coin radius
@@ -682,7 +682,7 @@ void nextGameFrame(bool reset){
     
         // Check X overlap and same lane as car
         if (carRight > playerLeft && carLeft < playerRight && player.getLane() == cars[i].getLane()){
-            drawCollision(cars[i].getXPos(), cars[i].getLane());
+            drawCollision(cars[i].getLane());
             endScreen();
         }
     }
@@ -696,14 +696,14 @@ void nextGameFrame(bool reset){
     
         // Check X overlap and same lane
         if (busRight > playerLeft && busLeft < playerRight && player.getLane() == buses[i].getLane()){
-            drawCollision(buses[i].getXPos(), buses[i].getLane());
+            drawCollision(buses[i].getLane());
             endScreen();
         }
     }
 }
 
 // Handle collision animations
-void drawCollision(int collisionXPos, int collisionLane){
+void drawCollision(int collisionLane){
     int yPos = 51;
     if (collisionLane == 2){
         yPos = 99;
@@ -714,7 +714,7 @@ void drawCollision(int collisionXPos, int collisionLane){
     FEHImage frames[8];
     for (int i = 0; i < 8; i++){
         frames[i].Open(("crash" + std::to_string(i+1) + ".png").c_str()); //c_str converts to char array
-        frames[i].Draw(collisionXPos - 10, yPos);
+        frames[i].Draw(5, yPos); // is 5 so centered on player
         Sleep(75);
     }
 }
