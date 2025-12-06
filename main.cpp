@@ -209,10 +209,14 @@ class scrollImage
         }
         image.Draw(x_pos, y_pos);
     }
+    int getX()
+    {
+        return x_pos;
+    }
     void updatePosition()
     {
         x_pos = x_pos - PIXELS_PER_FRAME;
-        if(x_pos < -50)
+        if(x_pos < -310)
         {
             x_pos = 320;
         }
@@ -223,6 +227,8 @@ class scrollImage
         image.Draw(x_pos, y_pos);
     }
 };
+
+
 
 class Car {
     private:
@@ -447,16 +453,23 @@ void nextGameFrame(bool reset){
 
     static Player player(2);
 
-    static scrollImage top[12];
-    static scrollImage bottom[12];
+    static scrollImage top1;
+    static scrollImage top2;
+    static scrollImage bottom1;
+    static scrollImage bottom2;
     int temp = 25;
     int i = 0;
     if (frameCount == 0){
-        for (int i = 0; i < 12; i++){
-            top[i] = scrollImage(true, temp);
-            bottom[i] = scrollImage(false, temp);
-            temp += 25;
-        }
+        top1 = scrollImage(true, 0);
+        top2 = scrollImage(true, 320);
+        bottom1 = scrollImage(false, 0);
+        bottom2 = scrollImage(false, 320);
+        top1.draw();
+        top2.draw();
+        bottom1.draw();
+        bottom2.draw();
+
+       
     }   
     // Reset game when coming back from menu
     if (reset) {
@@ -488,13 +501,17 @@ void nextGameFrame(bool reset){
     for (int i = 0; i < buses.size(); i++) {
         buses[i].updatePosition();
     }
-    for (int i = 0; i < 12; i++){
-        top[i].updatePosition();
-    }
-    for (int i = 0; i < 12; i++){
-        bottom[i].updatePosition();
-    }
+   
 
+    top1.updatePosition();
+    top2.updatePosition();
+    bottom1.updatePosition();
+    bottom2.updatePosition();
+
+    bottom1.draw();
+    bottom2.draw();
+    top1.draw();
+    top2.draw();
     // Add to distance every frame
     trackStats.updateDistance();
     
@@ -537,12 +554,14 @@ void nextGameFrame(bool reset){
     for (int i = 0; i < buses.size(); i++) {
         buses[i].draw();
     }
+    /*
     for (int i = 0; i < 12; i++){
         top[i].draw();
     }
     for (int i = 0; i < 12; i++){
         bottom[i].draw();
     }
+        */
     
     // Redraw player
     player.draw();
@@ -740,31 +759,6 @@ void drawCredits()
     //LCD.SetFontScale(0.5);
     
     
-    scrollImage top[12];
-    scrollImage bottom[12];
-    int temp = 25;
-    int i = 0;
-    for(int i = 0; i < 12; i++)
-    {
-            top[i] = scrollImage(true, temp);
-            bottom[i] = scrollImage(false, temp);
-            temp = temp + 25;
-    }
-    while(i < 1000)
-    {
-        
-
-        for(int i = 0; i < 12; i++)
-        {
-            top[i].updatePosition();
-            bottom[i].updatePosition();
-            top[i].draw();
-            bottom[i].draw();
-        }
-
-        Sleep(20);
-        i++;
-    }
      
 
     FEHImage credits;
@@ -799,7 +793,7 @@ void drawCredits()
 
 
 
-//parameter of stats
+
 void endScreen()
 {
     LCD.Clear();
