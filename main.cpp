@@ -17,6 +17,7 @@ void drawCredits();
 void introScreen();
 void nextGameFrame(bool reset);
 void endScreen();
+void drawCollision(int );
 
 
 // Make compiler happy
@@ -32,12 +33,12 @@ class StatTracker {
         int distance;
         int coins;
         int score;
-        int time;
         int maxDistance;
         int maxCoins;
         int maxScore;
-        int maxTime;
+        int time;
         int startTime;
+        int maxTime;
         void updateScore(){
             score = distance + 50*coins;
         }
@@ -54,12 +55,6 @@ class StatTracker {
         int getDistance(){
             return distance;
         }
-        int* getTime(){
-            return &time;
-        }
-        int* getstartTime(){
-            return &startTime;
-        }
         void coinCollected(){
             coins++;
             updateScore();
@@ -70,6 +65,13 @@ class StatTracker {
         int getScore(){
             return score;
         }
+        int* getTime(){
+            return &time;
+        }
+        int* getstartTime(){
+            return &startTime;
+        }
+
         int* getMaxDistance(){
             return &maxDistance;
         }
@@ -92,12 +94,10 @@ class StatTracker {
             distance = 0;
             coins = 0;
             score = 0;
-            time = 0;
         }
         
 };
 
-       
 static void updateMaxDistance(int d, int* max)
 {
     if(d > *(max))
@@ -128,11 +128,51 @@ static void updateMaxTime(int t, int* max)
     {
         *(max) = t;
     }
-          
+         
 }
+
 
 //Instantiate this class globally
 StatTracker trackStats = StatTracker();
+
+class LanesDrawer{
+    private:
+        int laneXPositions[6];
+        const int DASH_WIDTH = SCREEN_WIDTH / 10;
+    public:
+        LanesDrawer(){
+            for (int i = 0; i < 6; i++){
+                laneXPositions[i] = 2 * i * DASH_WIDTH;
+            }
+        }
+        void drawNextLaneFrame(){
+            LCD.SetFontColor(WHITE);
+            
+            // Solid top edge
+            LCD.DrawLine(0, SCREEN_HEIGHT / 5, SCREEN_WIDTH, SCREEN_HEIGHT / 5); 
+
+            // Top dashed lane divider
+            for (int i = 0; i < 6; i++){
+                LCD.DrawLine(laneXPositions[i], SCREEN_HEIGHT * 2 / 5, laneXPositions[i] + DASH_WIDTH, SCREEN_HEIGHT * 2 / 5);
+            }
+
+            // Bottom dashed lane divider
+            for (int i = 0; i < 6; i++){
+                LCD.DrawLine(laneXPositions[i], SCREEN_HEIGHT * 3 / 5, laneXPositions[i] + DASH_WIDTH, SCREEN_HEIGHT * 3 / 5);
+            }
+
+            // Solid bottom edge
+            LCD.DrawLine(0, SCREEN_HEIGHT * 4 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 4 / 5);
+
+            // Move lanes' x position
+            for (int i = 0; i < 6; i++){
+                laneXPositions[i] -= PIXELS_PER_FRAME;
+                if (laneXPositions[i] <= -DASH_WIDTH){
+                    laneXPositions[i] = SCREEN_WIDTH + DASH_WIDTH;
+                }
+            }
+        }
+};
 
 class Player {
     private:
@@ -148,17 +188,17 @@ class Player {
         x_pos = 5; // Start at left
         if (inputLane == 1){
             lane = 1;
-            y_pos = 50;
+            y_pos = 54;
             image.Draw(x_pos, y_pos);
         }
         else if (inputLane == 2){
             lane = 2;
-            y_pos =  98;
+            y_pos =  102;
             image.Draw(x_pos, y_pos);
         } 
         else if(inputLane == 3){
             lane = 3;
-            y_pos = 146;
+            y_pos = 150;
             image.Draw(x_pos, y_pos);
         }
     }
@@ -169,12 +209,12 @@ class Player {
         if(lane == 2)
         {
             lane = 1;
-            y_pos = 50;
+            y_pos = 54;
         }
         else if(lane == 3)
         {
             lane = 2;
-            y_pos = 98;
+            y_pos = 102;
         } 
     }
     void moveDown()
@@ -182,12 +222,12 @@ class Player {
         if(lane == 2)
         {
             lane = 3;
-            y_pos = 146;
+            y_pos = 150;
         }
         else if(lane == 1)
         {
             lane = 2;
-            y_pos = 98;
+            y_pos = 102;
         } 
     }
     // Redraw player each frame
@@ -204,6 +244,11 @@ class Coin {
         int lane = 1; // Default lane
         int x_pos, y_pos;
         #define COIN_RADIUS 10
+        int frameCount;
+        FEHImage coin1;
+        FEHImage coin2;
+        FEHImage coin3;
+        FEHImage coin4;
     public:
     // Constructor - lane 1 is top, 2 is center, 3 is bottom
     Coin(int laneInput){
@@ -220,6 +265,12 @@ class Coin {
             lane = 3;
         }
         x_pos = SCREEN_WIDTH + COIN_RADIUS*2; // Start at right of screen
+        frameCount = 0;
+
+        coin1.Open("coin1.png");
+        coin2.Open("coin2.png");
+        coin3.Open("coin3.png");
+        coin4.Open("coin4.png");
     }
     void updatePosition(){
         // Move coin left across the screen
@@ -227,10 +278,17 @@ class Coin {
     }
     // Redraw coin each frame
     void draw(){
-        // Until we get graphics, represent coin as a circle
-        LCD.SetFontColor(YELLOW);
-        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS);
-        LCD.SetFontColor(WHITE);
+        if (frameCount >= 0 && frameCount <= 2){
+            coin1.Draw(x_pos - COIN_RADIUS, y_pos - COIN_RADIUS);
+        } else if (frameCount >= 3 && frameCount <= 5){
+            coin2.Draw(x_pos - COIN_RADIUS, y_pos - COIN_RADIUS);
+        } else if (frameCount >= 6 && frameCount <= 8){
+            coin3.Draw(x_pos - COIN_RADIUS, y_pos - COIN_RADIUS);
+        } else if (frameCount >= 9 && frameCount <= 11){
+            coin4.Draw(x_pos - COIN_RADIUS, y_pos - COIN_RADIUS);
+            frameCount = -1;
+        }
+        frameCount++;
     }
     int getXPos(){
         return x_pos;
@@ -298,13 +356,13 @@ class Car {
         static const int CAR_WIDTH = 45;
     Car(int laneInput) {
         if (laneInput == 1){
-            y_pos = SCREEN_WIDTH / 5;
+            y_pos = 59;
             lane = 1;
         } else if (laneInput == 2){
-            y_pos = SCREEN_WIDTH / 5 + 42;
+            y_pos = 107;
             lane = 2;
         } else if (laneInput == 3){
-            y_pos = SCREEN_WIDTH / 5 + 92;
+            y_pos = 155;
             lane = 3;
         }
         x_pos = SCREEN_WIDTH;
@@ -335,13 +393,13 @@ class Bus {
     public:
     Bus(int laneInput){
         if (laneInput == 1){
-            y_pos = SCREEN_WIDTH / 5;
+            y_pos = 54;
             lane = 1;
         } else if (laneInput == 2){
-            y_pos = SCREEN_WIDTH / 5 + 42;
+            y_pos = 102;
             lane = 2;
         } else if (laneInput == 3){
-            y_pos = SCREEN_WIDTH / 5 + 92;
+            y_pos = 150;
             lane = 3;
         }
         x_pos = SCREEN_WIDTH;
@@ -435,7 +493,7 @@ void drawPlay()
     LCD.Clear();
     trackStats.resetStats();
 
-    //TO DO: Intro screens
+    introScreen();
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
@@ -482,8 +540,18 @@ void introScreen()
     FEHImage first;
     first.Open("Evil Money Guy Updated2.png");
     first.Draw(0,0);
-
     Sleep(2.5);
+    int rad = 0;
+    LCD.SetFontColor(WHITE);
+    while (rad < SCREEN_WIDTH){
+        LCD.FillCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, rad);
+        rad += 2; // arbitrary
+        Sleep(1);
+    }
+    LCD.SetFontColor(BLACK);
+
+
+
     FEHImage second;
     second.Open("Planning Guy Updated.png");
     second.Draw(0,0);
@@ -519,8 +587,6 @@ void nextGameFrame(bool reset){
     static scrollImage bottom2;
     int temp = 25;
     int i = 0;
-    int startTime = 0;
-    int* start = trackStats.getstartTime();
     if (frameCount == 0){
         top1 = scrollImage(true, 0);
         top2 = scrollImage(true, SCREEN_WIDTH);
@@ -600,11 +666,8 @@ void nextGameFrame(bool reset){
     deleteOffScreenObjects(&coins, &cars, &buses);
 
     // Redraw lanes after clearing
-    LCD.SetFontColor(WHITE);
-    LCD.DrawLine(0, SCREEN_HEIGHT / 5, SCREEN_WIDTH, SCREEN_HEIGHT / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 2 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 2 / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 3 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 3 / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 4 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 4 / 5);
+    static LanesDrawer lanesDrawer = LanesDrawer();
+    lanesDrawer.drawNextLaneFrame();
 
     // Redraw all objectss
     for (int i = 0; i < coins.size(); i++) {
@@ -629,6 +692,8 @@ void nextGameFrame(bool reset){
     trackStats.drawScore();
 
     // Check collisions
+    const int CAR_FORGIVENESS = 6;
+    const int BUS_FORGIVENESS = 12;
     for (int i = 0; i < coins.size(); i++){
         // Check if coin overlaps with player
         int coinLeft = coins[i].getXPos() - 10; // 10 is coin radius
@@ -644,36 +709,52 @@ void nextGameFrame(bool reset){
 
     for (int i = 0; i < cars.size(); i++){
         // Check if car overlaps with player
-        int carLeft = cars[i].getXPos();
-        int carRight = carLeft + Car::CAR_WIDTH;
+        int carLeft = cars[i].getXPos() + CAR_FORGIVENESS;
+        int carRight = carLeft + Car::CAR_WIDTH - 2 * CAR_FORGIVENESS;
         int playerLeft = 5; // Player x position
         int playerRight = playerLeft + 35; // Add player width
     
         // Check X overlap and same lane as car
         if (carRight > playerLeft && carLeft < playerRight && player.getLane() == cars[i].getLane()){
+            drawCollision(cars[i].getLane());
             endScreen();
         }
     }
 
     for (int i = 0; i < buses.size(); i++){
         // Check if bus overlaps with player
-        int busLeft = buses[i].getXPos();
-        int busRight = busLeft + 90; // Bus width
+        int busLeft = buses[i].getXPos() + BUS_FORGIVENESS;
+        int busRight = busLeft + 90 - 2 * BUS_FORGIVENESS; // 90 is Bus width
         int playerLeft = 5; // Player x position
         int playerRight = playerLeft + 35; // Add player width
     
         // Check X overlap and same lane
         if (busRight > playerLeft && busLeft < playerRight && player.getLane() == buses[i].getLane()){
+            drawCollision(buses[i].getLane());
             endScreen();
         }
     }
 
     int* tempTime = trackStats.getTime();
     *(tempTime) = TimeNow() - *(trackStats.getstartTime());
-
-
 }
 
+// Handle collision animations
+void drawCollision(int collisionLane){
+    int yPos = 51;
+    if (collisionLane == 2){
+        yPos = 99;
+    } else if (collisionLane == 3){
+        yPos = 147;
+    }
+
+    FEHImage frames[8];
+    for (int i = 0; i < 8; i++){
+        frames[i].Open(("crash" + std::to_string(i+1) + ".png").c_str()); //c_str converts to char array
+        frames[i].Draw(5, yPos); // is 5 so centered on player
+        Sleep(75);
+    }
+}
 
 void collectCoin(std::vector<Coin> *coins, int coinID){
     (*coins).erase((*coins).begin() + coinID);
