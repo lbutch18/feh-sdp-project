@@ -84,7 +84,6 @@ class StatTracker {
         
 };
 
-       
 static void updateMaxDistance(int d, int* max)
 {
     if(d > *(max))
@@ -112,6 +111,45 @@ static void updateMaxScore(int s, int* max)
 
 //Instantiate this class globally
 StatTracker trackStats = StatTracker();
+
+class LanesDrawer{
+    private:
+        int laneXPositions[6];
+        const int DASH_WIDTH = SCREEN_WIDTH / 10;
+    public:
+        LanesDrawer(){
+            for (int i = 0; i < 6; i++){
+                laneXPositions[i] = 2 * i * DASH_WIDTH;
+            }
+        }
+        void drawNextLaneFrame(){
+            LCD.SetFontColor(WHITE);
+            
+            // Solid top edge
+            LCD.DrawLine(0, SCREEN_HEIGHT / 5, SCREEN_WIDTH, SCREEN_HEIGHT / 5); 
+
+            // Top dashed lane divider
+            for (int i = 0; i < 6; i++){
+                LCD.DrawLine(laneXPositions[i], SCREEN_HEIGHT * 2 / 5, laneXPositions[i] + DASH_WIDTH, SCREEN_HEIGHT * 2 / 5);
+            }
+
+            // Bottom dashed lane divider
+            for (int i = 0; i < 6; i++){
+                LCD.DrawLine(laneXPositions[i], SCREEN_HEIGHT * 3 / 5, laneXPositions[i] + DASH_WIDTH, SCREEN_HEIGHT * 3 / 5);
+            }
+
+            // Solid bottom edge
+            LCD.DrawLine(0, SCREEN_HEIGHT * 4 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 4 / 5);
+
+            // Move lanes' x position
+            for (int i = 0; i < 6; i++){
+                laneXPositions[i] -= PIXELS_PER_FRAME;
+                if (laneXPositions[i] <= -DASH_WIDTH){
+                    laneXPositions[i] = SCREEN_WIDTH + DASH_WIDTH;
+                }
+            }
+        }
+};
 
 class Player {
     private:
@@ -576,11 +614,8 @@ void nextGameFrame(bool reset){
     deleteOffScreenObjects(&coins, &cars, &buses);
 
     // Redraw lanes after clearing
-    LCD.SetFontColor(WHITE);
-    LCD.DrawLine(0, SCREEN_HEIGHT / 5, SCREEN_WIDTH, SCREEN_HEIGHT / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 2 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 2 / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 3 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 3 / 5);
-    LCD.DrawLine(0, SCREEN_HEIGHT * 4 / 5, SCREEN_WIDTH, SCREEN_HEIGHT * 4 / 5);
+    static LanesDrawer lanesDrawer = LanesDrawer();
+    lanesDrawer.drawNextLaneFrame();
 
     // Redraw all objectss
     for (int i = 0; i < coins.size(); i++) {
