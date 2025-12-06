@@ -221,6 +221,11 @@ class Coin {
         int lane = 1; // Default lane
         int x_pos, y_pos;
         #define COIN_RADIUS 10
+        int frameCount;
+        FEHImage coin1;
+        FEHImage coin2;
+        FEHImage coin3;
+        FEHImage coin4;
     public:
     // Constructor - lane 1 is top, 2 is center, 3 is bottom
     Coin(int laneInput){
@@ -237,6 +242,12 @@ class Coin {
             lane = 3;
         }
         x_pos = SCREEN_WIDTH + COIN_RADIUS*2; // Start at right of screen
+        frameCount = 0;
+
+        coin1.Open("coin1.png");
+        coin2.Open("coin2.png");
+        coin3.Open("coin3.png");
+        coin4.Open("coin4.png");
     }
     void updatePosition(){
         // Move coin left across the screen
@@ -244,10 +255,17 @@ class Coin {
     }
     // Redraw coin each frame
     void draw(){
-        // Until we get graphics, represent coin as a circle
-        LCD.SetFontColor(YELLOW);
-        LCD.FillCircle(x_pos, y_pos, COIN_RADIUS);
-        LCD.SetFontColor(WHITE);
+        if (frameCount >= 0 && frameCount <= 2){
+            coin1.Draw(x_pos - COIN_RADIUS, y_pos - COIN_RADIUS);
+        } else if (frameCount >= 3 && frameCount <= 5){
+            coin2.Draw(x_pos - COIN_RADIUS, y_pos - COIN_RADIUS);
+        } else if (frameCount >= 6 && frameCount <= 8){
+            coin3.Draw(x_pos - COIN_RADIUS, y_pos - COIN_RADIUS);
+        } else if (frameCount >= 9 && frameCount <= 11){
+            coin4.Draw(x_pos - COIN_RADIUS, y_pos - COIN_RADIUS);
+            frameCount = -1;
+        }
+        frameCount++;
     }
     int getXPos(){
         return x_pos;
