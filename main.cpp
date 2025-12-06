@@ -177,28 +177,30 @@ class Player {
     private:
         int lane;
         int x_pos, y_pos;
-        FEHImage image;
         int SPRITE_W = 35;
         int SPRITE_H = 35;
+        int frameCount;
+        FEHImage frames[7];
     public:
     Player(int inputLane)
     {
-        image.Open("player updated.png");
         x_pos = 5; // Start at left
+        frameCount = 0;
         if (inputLane == 1){
             lane = 1;
             y_pos = 54;
-            image.Draw(x_pos, y_pos);
         }
         else if (inputLane == 2){
             lane = 2;
             y_pos =  102;
-            image.Draw(x_pos, y_pos);
         } 
         else if(inputLane == 3){
             lane = 3;
             y_pos = 150;
-            image.Draw(x_pos, y_pos);
+        }
+
+        for (int i = 0; i < 7; i++){
+            frames[i].Open(("player_run_frame_" + std::to_string(i + 1) + ".png").c_str()); // Open each frame
         }
     }
     //X Position will be top left corner of picture to draw;
@@ -231,7 +233,11 @@ class Player {
     }
     // Redraw player each frame
     void draw() {
-        image.Draw(x_pos, y_pos);
+        frames[frameCount].Draw(x_pos, y_pos);
+        frameCount++;
+        if (frameCount >= 7){
+            frameCount = 0; // reset frame count
+        }
     }
     int getLane() {
         return lane;
