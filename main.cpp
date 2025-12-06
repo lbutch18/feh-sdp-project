@@ -15,6 +15,7 @@ void drawStatistics();
 void drawInstructions();
 void drawCredits();
 void introScreen();
+void animateBetweenButton(float x, float y);
 void nextGameFrame(bool reset);
 void endScreen();
 void drawCollision(int );
@@ -33,12 +34,12 @@ class StatTracker {
         int distance;
         int coins;
         int score;
+        int time;
         int maxDistance;
         int maxCoins;
         int maxScore;
-        int time;
-        int startTime;
         int maxTime;
+        int startTime;
         void updateScore(){
             score = distance + 50*coins;
         }
@@ -55,6 +56,12 @@ class StatTracker {
         int getDistance(){
             return distance;
         }
+        int* getTime(){
+            return &time;
+        }
+        int* getstartTime(){
+            return &startTime;
+        }
         void coinCollected(){
             coins++;
             updateScore();
@@ -65,13 +72,6 @@ class StatTracker {
         int getScore(){
             return score;
         }
-        int* getTime(){
-            return &time;
-        }
-        int* getstartTime(){
-            return &startTime;
-        }
-
         int* getMaxDistance(){
             return &maxDistance;
         }
@@ -94,6 +94,7 @@ class StatTracker {
             distance = 0;
             coins = 0;
             score = 0;
+            time = 0;
         }
         
 };
@@ -128,9 +129,8 @@ static void updateMaxTime(int t, int* max)
     {
         *(max) = t;
     }
-         
+          
 }
-
 
 //Instantiate this class globally
 StatTracker trackStats = StatTracker();
@@ -471,21 +471,40 @@ void drawMenu() {
         if (x_pos > SCREEN_WIDTH / 2 - boxWidth / 2 && x_pos < SCREEN_WIDTH / 2 + boxWidth / 2) {
             if (y_pos > 50 && y_pos < 50 + boxHeight) {
                 boxTouched = true;
+                animateBetweenButton(x_pos, y_pos);
                 drawPlay();
             }
             else if (y_pos > 100 && y_pos < 100 + boxHeight) {
                 boxTouched = true;
+                animateBetweenButton(x_pos, y_pos);
                 drawInstructions();
             }
             else if (y_pos > 150 && y_pos < 150 + boxHeight) {
+                animateBetweenButton(x_pos, y_pos);
                 boxTouched = true;
                 drawStatistics();
             } else if (y_pos > 200 && y_pos < 200 + boxHeight) {
+                animateBetweenButton(x_pos, y_pos);
                 boxTouched = true;
                 drawCredits();
             }
         }
     }
+}
+
+void animateBetweenButton(float x, float y)
+{
+    
+    float centerX = x;
+    float centerY = y;
+    int rad = 0;
+    LCD.SetFontColor(WHITE);
+    while (rad < SCREEN_WIDTH){
+        LCD.FillCircle(centerX, centerY, rad);
+        rad += 2; // arbitrary
+        Sleep(1);
+    }
+    LCD.SetFontColor(BLACK);
 }
 
 void drawPlay()
@@ -517,7 +536,7 @@ void drawPlay()
         }
         while (LCD.Touch(&x_dummy, &y_dummy)){
             nextGameFrame(reset);
-            Sleep(FRAME_RATE); // Frame rate - should be faster as time goes on eventually
+            Sleep(FRAME_RATE);
             reset = false;
             frameCount++;
             if (frameCount % 500 == 0){ // Increase pixels per frame every so often to increase difficulty
@@ -537,26 +556,22 @@ void drawPlay()
 void introScreen()
 {
     LCD.Clear();
+    
     FEHImage first;
     first.Open("Evil Money Guy Updated2.png");
     first.Draw(0,0);
+
+   
+
+
     Sleep(2.5);
-    int rad = 0;
-    LCD.SetFontColor(WHITE);
-    while (rad < SCREEN_WIDTH){
-        LCD.FillCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, rad);
-        rad += 2; // arbitrary
-        Sleep(1);
-    }
-    LCD.SetFontColor(BLACK);
-
-
-
     FEHImage second;
     second.Open("Planning Guy Updated.png");
     second.Draw(0,0);
+    
 
     Sleep(2.5);
+    LCD.SetFontColor(BLACK);
     FEHImage third;
     third.Open("Heist Happening Updated 1.png");
     third.Draw(0,0);
@@ -587,6 +602,8 @@ void nextGameFrame(bool reset){
     static scrollImage bottom2;
     int temp = 25;
     int i = 0;
+    int startTime = 0;
+    int* start = trackStats.getstartTime();
     if (frameCount == 0){
         top1 = scrollImage(true, 0);
         top2 = scrollImage(true, SCREEN_WIDTH);
@@ -734,7 +751,6 @@ void nextGameFrame(bool reset){
             endScreen();
         }
     }
-
     int* tempTime = trackStats.getTime();
     *(tempTime) = TimeNow() - *(trackStats.getstartTime());
 }
@@ -842,7 +858,7 @@ void drawStatistics()
     distance.append(std::to_string(*(trackStats.getMaxDistance())));
     LCD.WriteAt(distance, 20, 110);
     LCD.WriteAt("Score: " + std::to_string(*(trackStats.getMaxScore())), 20, 140);
-    LCD.WriteAt("Time: " + std::to_string(*(trackStats.getMaxTime())), 20, 170);
+    LCD.WriteAt("Time: " + std::to_string(*(trackStats.getMaxTime())) + "s", 20, 170);
     LCD.SetFontScale(1.0);
 
 
@@ -960,7 +976,7 @@ void endScreen()
     LCD.WriteAt(coins, 20, 80);
     std::string distance = "Distance traveled: " + std::to_string(trackStats.getDistance())  + "m";
     LCD.WriteAt(distance, 20, 110);
-    std::string time = "Time: " + std::to_string(*(trackStats.getTime()));
+    std::string time = "Time: " + std::to_string(*(trackStats.getTime())) + "s";
     LCD.WriteAt(time, 20, 140);
     LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 170);
     
