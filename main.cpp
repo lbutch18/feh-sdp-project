@@ -770,11 +770,7 @@ void nextGameFrame(bool reset){
     // Easter egg music if you go far enough
     if (frameCount == 2095){
         farMusic.setVolume(0.5);
-        // Create thread to play sound without blocking otherwise it will lag badly
-        HANDLE hThread = CreateThread(NULL, 0, playSoundThread, (LPVOID)&farMusic, 0, NULL);
-        if (hThread != NULL) {
-            CloseHandle(hThread); // Release handle, thread continues
-        }
+        farMusic.play();
     }
 
     // Handle random generation of obstacles/coins
@@ -928,8 +924,8 @@ void drawCollision(int collisionLane){
 
 
 // Need to use threading because .play() isn't fully async
-DWORD WINAPI playSoundThread(LPVOID lpParam) {
-    FEHSound* sound = static_cast<FEHSound*>(lpParam);
+DWORD WINAPI playSoundThread(LPVOID soundptr) {
+    FEHSound* sound = static_cast<FEHSound*>(soundptr);
     sound->play();
     return 0;
 }
