@@ -4,11 +4,12 @@
 #include <FEHKeyboard.h>
 #include <FEHRandom.h>
 
-
+//Constants
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
 int PIXELS_PER_FRAME = 3;
 
+//Functions Prototypes
 void drawMenu();
 void drawPlay();
 void drawStatistics();
@@ -29,6 +30,16 @@ void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vecto
 void deleteOffScreenObjects(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses);
 void collectCoin(std::vector<Coin> *coins, int coinID);
 
+/*
+Generative AI was used to create images - more thorough accreditation can be found on our website
+*/
+
+/*
+Luke Butcher and Audrey Malcuit
+Class to track statistics throughout game for end screen and also keep track of max stats for statistics
+Variables for max and each run values for: score, distance, coins, and time
+Functions to access instance variables (some return pointers to update them, mainly max), draw score on screen, and reset stats between games 
+*/
 class StatTracker {
     private:
         int distance;
@@ -99,6 +110,9 @@ class StatTracker {
         
 };
 
+/*
+Audrey Malcuit: takes in current run distance and compares it to max to see if max distance should be updated
+*/
 static void updateMaxDistance(int d, int* max)
 {
     if(d > *(max))
@@ -107,6 +121,9 @@ static void updateMaxDistance(int d, int* max)
     }
           
 }
+/*
+Audrey Malcuit: takes in current run coins and compares it to max to see if max coins should be updated
+*/
 static void updateMaxCoins(int c, int* max)
 {
     if(c > *(max))
@@ -115,6 +132,9 @@ static void updateMaxCoins(int c, int* max)
     }
           
 }
+/*
+Audrey Malcuit: takes in current run score and compares it to max to see if max score should be updated
+*/
 static void updateMaxScore(int s, int* max)
 {
     if(s > *(max))
@@ -123,6 +143,9 @@ static void updateMaxScore(int s, int* max)
     }
           
 }
+/*
+Audrey Malcuit: takes in current run time and compares it to max to see if max time should be updated
+*/
 static void updateMaxTime(int t, int* max)
 {
     if(t > *(max))
@@ -135,6 +158,12 @@ static void updateMaxTime(int t, int* max)
 //Instantiate this class globally
 StatTracker trackStats = StatTracker();
 
+/*
+Luke Butcher
+Allows for dotted lines to be drawn to simulate lanes
+Array of lines for each lane - initialized with respective y positions for each lane
+Solid lines on outside, dashed for interior lanes, progresses lanes during game
+*/
 class LanesDrawer{
     private:
         int laneXPositions[6];
@@ -174,6 +203,12 @@ class LanesDrawer{
         }
 };
 
+/*
+Audrey Malcuit and Luke Butcher
+Create player with input of lane - sets up x and y coordinates and draws player
+Functions to moveUp and moveDown in response to user keyboard input
+Draw function and get function for lane
+*/
 class Player {
     private:
         int lane;
@@ -239,6 +274,11 @@ class Player {
     }
 };
 
+/*
+Luke Butcher
+Creates coins and sets their dimensions and positions according to lane
+Functions to update the position of the coins, draw the coins, and get functions for the x position and the lane
+*/
 class Coin {
     private:
         int lane = 1; // Default lane
@@ -298,6 +338,12 @@ class Coin {
     }
 };
 
+/*
+Audrey Malcuit
+Creation of top and bottom scrolling cityscapes throughout game to simulate moving forward
+Boolean true for top, false for bottom - x position changes throughout and is updated throughout, y coordinates stay constant
+Get function for x coordinate and draw function 
+*/
 class scrollImage
 {
     private:
@@ -305,10 +351,9 @@ class scrollImage
         FEHImage image;
         int x_pos, y_pos;
     public:
-    //Will have to create starting images with x as input
     scrollImage()
     {
-
+        
     }
     scrollImage(boolean top, int x)
     {
@@ -346,7 +391,12 @@ class scrollImage
 };
 
 
-
+/*
+Luke Butcher
+Creates car with lane, x position, y position, and image
+Update function to update position throughout the game and draw function to redraw every frame
+Get functions for x and y to be able to check those coordinates for collisions
+*/
 class Car {
     private:
         int lane;
@@ -385,6 +435,12 @@ class Car {
     }
 };
 
+/*
+Luke Butcher
+Creates bus with lane, x position, y position, and image
+Update function to update position throughout the game and draw function to redraw every frame
+Get functions for x and y to be able to check those coordinates for collisions
+*/
 class Bus {
     private:
         int lane;
@@ -423,14 +479,19 @@ class Bus {
     }
 };
 
+//Main function to run program
 int main()
 {
     // Don't print warnings
     freopen("/dev/null", "w", stdout);
 
-    drawMenu();
+    drawMenu(); // Draw beginning menu screen
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Shows beginning screen with background and button boxes - game will respond to user button input and change screens
+*/
 void drawMenu() {
     LCD.Clear();
     int boxWidth = SCREEN_WIDTH / 1.5;
@@ -492,6 +553,10 @@ void drawMenu() {
     }
 }
 
+/*
+Audrey Malcuit
+Have a white circle get bigger and bigger across the screen, starting where the user touched, as a transition
+*/
 void animateBetweenButton(float x, float y)
 {
     
@@ -507,6 +572,10 @@ void animateBetweenButton(float x, float y)
     LCD.SetFontColor(BLACK);
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Calls the intro screen function with story line, updates start time for stats, runs until end of game or user presses back arrow
+*/
 void drawPlay()
 {
     LCD.Clear();
@@ -521,7 +590,7 @@ void drawPlay()
     int frameCount = 0; // Need to keep track of frame count to determine when to speed up
     PIXELS_PER_FRAME = 3;
     int* startTime = trackStats.getstartTime();
-    *(startTime) = TimeNow();
+    *(startTime) = TimeNow(); //Reset start time for each run
     while(!exit)
     {
         // Run game frames until back button is pressed
@@ -544,7 +613,7 @@ void drawPlay()
             }
         }
         
-        if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
+        if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){ //Back arrow coordinates
             exit = true;
         }
     }
@@ -552,7 +621,11 @@ void drawPlay()
     drawMenu();
 }
 
-
+/*
+Audrey Malcuit
+Cycle through AI-generated image screens as an intro storyline
+Gives user option to skip storyline together at any time with pressing space bar or moving quicker through the storyline by pressing any other key
+*/
 void introScreen()
 {
     LCD.Clear();
@@ -562,6 +635,12 @@ void introScreen()
     introI.Draw(0,0);
     bool end = false;
 
+    /*
+    This code is largely the same for the next pictures
+    Get start time - max time on screen without user input is 5 seconds
+    Respond to keyboard press or touch on screen
+    Check for space first, and if so break out of inner loop and outer loop
+    */
     int introTime = TimeNow();
     float dummyx = 0;
     float dummyy = 0;
@@ -578,9 +657,9 @@ void introScreen()
             any = true;
         }
     }
-    any = false;
+    any = false; //reset throughout for next while loop condition
 
-    while(!Keyboard.isPressed(KEY_SPACE) && !end && !space)
+    while(!Keyboard.isPressed(KEY_SPACE) && !end && !space) //end condition so that it only shows storyline once
     {
 
         
@@ -688,6 +767,11 @@ void introScreen()
 
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Redraws screen every frame (background, obstacles, player, updates score, time, and coins, and checks for collisions
+Finish this
+*/
 void nextGameFrame(bool reset){
     // All objects should be declared static so their locations/states are maintained
     // Reminder, the object constructors take in lane number (1 = left, 2 = center, 3 = right)
