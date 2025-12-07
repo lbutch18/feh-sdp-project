@@ -3,11 +3,19 @@
 #include <FEHUtility.h>
 #include <FEHKeyboard.h>
 #include <FEHRandom.h>
-
+#include <FEHSound.h>
+#include <windows.h>
 //Constants
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
 int PIXELS_PER_FRAME = 3;
+
+FEHSound collision("8-bit-explosion-10-340462.wav");
+FEHSound coinCollect("retro-coin-4-236671.wav");
+FEHSound menuMusic("menu-music.wav");
+FEHSound gameMusic("game-music.wav");
+FEHSound farMusic("far-music.wav");
+
 
 //Functions Prototypes
 void drawMenu();
@@ -19,6 +27,7 @@ void introScreen();
 void animateBetweenButton(float x, float y);
 void nextGameFrame(bool reset);
 void endScreen();
+void drawCollision(int );
 void drawCollision(int );
 
 
@@ -212,29 +221,34 @@ Draw function and get function for lane
 class Player {
     private:
         int lane;
-        int x_pos, y_pos;
-        FEHImage image;
+        int x_pos, y_pos, last_y_pos;
         int SPRITE_W = 35;
         int SPRITE_H = 35;
+        int frameCount;
+        FEHImage frames[8];
     public:
     Player(int inputLane)
     {
-        image.Open("player updated.png");
         x_pos = 5; // Start at left
+        frameCount = 0;
         if (inputLane == 1){
             lane = 1;
             y_pos = 54;
-            image.Draw(x_pos, y_pos);
+            last_y_pos = y_pos;
         }
         else if (inputLane == 2){
             lane = 2;
             y_pos =  102;
-            image.Draw(x_pos, y_pos);
+            last_y_pos = y_pos;
         } 
         else if(inputLane == 3){
             lane = 3;
             y_pos = 150;
-            image.Draw(x_pos, y_pos);
+            last_y_pos = y_pos;
+        }
+
+        for (int i = 0; i < 8; i++){
+            frames[i].Open(("player_run_frame_" + std::to_string(i + 1) + ".png").c_str()); // Open each frame
         }
     }
     //X Position will be top left corner of picture to draw;
@@ -267,7 +281,17 @@ class Player {
     }
     // Redraw player each frame
     void draw() {
-        image.Draw(x_pos, y_pos);
+        // Make it smooth easiest way i could think of
+        if (last_y_pos < y_pos){
+            last_y_pos += 16; // If we change this make sure it's a factor of 48 otherwise it'l break (gap dist)
+        }else if (last_y_pos > y_pos){
+            last_y_pos -= 16;
+        }
+        frames[frameCount].Draw(x_pos, last_y_pos);
+        frameCount++;
+        if (frameCount >= 8){
+            frameCount = 0; // reset frame count
+        }
     }
     int getLane() {
         return lane;
@@ -493,6 +517,11 @@ Audrey Malcuit and Luke Butcher
 Shows beginning screen with background and button boxes - game will respond to user button input and change screens
 */
 void drawMenu() {
+    menuMusic.setVolume(0.5);
+    menuMusic.play();
+    gameMusic.pause();
+    farMusic.pause();
+
     LCD.Clear();
     int boxWidth = SCREEN_WIDTH / 1.5;
     int boxHeight = SCREEN_HEIGHT / 8;
@@ -566,7 +595,7 @@ void animateBetweenButton(float x, float y)
     LCD.SetFontColor(WHITE);
     while (rad < SCREEN_WIDTH){
         LCD.FillCircle(centerX, centerY, rad);
-        rad += 2; // arbitrary
+        rad += 3; // arbitrary
         Sleep(1);
     }
     LCD.SetFontColor(BLACK);
@@ -582,17 +611,30 @@ void drawPlay()
     trackStats.resetStats();
 
     introScreen();
+    LCD.SetFontColor(BLACK);
+    int rad = 0;
+    while (rad < SCREEN_WIDTH){
+        LCD.FillCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, rad);
+        rad += 3; // arbitrary
+        Sleep(1);
+    }
 
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     bool reset = true; // To reset game state on first frame after entering from menu
-    int FRAME_RATE = 10; // Set frame redraw time to 10 ms
+    int FRAME_RATE = 6; // Set frame redraw time to 10 ms
     int frameCount = 0; // Need to keep track of frame count to determine when to speed up
     PIXELS_PER_FRAME = 3;
     int* startTime = trackStats.getstartTime();
     *(startTime) = TimeNow(); //Reset start time for each run
+    
+    gameMusic.setVolume(0.5);
+    menuMusic.pause();
+    farMusic.pause();
+    gameMusic.play();
     while(!exit)
     {
+        
         // Run game frames until back button is pressed
         while (!LCD.Touch(&x_pos, &y_pos)){
             nextGameFrame(reset);
@@ -812,6 +854,16 @@ void nextGameFrame(bool reset){
         coins.clear();
         cars.clear();
         buses.clear();
+        top1 = scrollImage(true, 0);
+        top2 = scrollImage(true, SCREEN_WIDTH);
+        bottom1 = scrollImage(false, 0);
+        bottom2 = scrollImage(false, SCREEN_WIDTH);
+    }
+
+    // Easter egg music if you go far enough
+    if (frameCount == 2095){
+        farMusic.setVolume(0.5);
+        farMusic.play();
     }
 
     // Handle random generation of obstacles/coins
@@ -946,6 +998,8 @@ void nextGameFrame(bool reset){
 
 // Handle collision animations
 void drawCollision(int collisionLane){
+    collision.play();
+
     int yPos = 51;
     if (collisionLane == 2){
         yPos = 99;
@@ -961,8 +1015,23 @@ void drawCollision(int collisionLane){
     }
 }
 
+
+// Need to use threading because .play() isn't fully async
+DWORD WINAPI playSoundThread(LPVOID soundptr) {
+    FEHSound* sound = static_cast<FEHSound*>(soundptr);
+    sound->play();
+    return 0;
+}
+
 void collectCoin(std::vector<Coin> *coins, int coinID){
     (*coins).erase((*coins).begin() + coinID);
+    
+    // Create thread to play sound without blocking
+    HANDLE hThread = CreateThread(NULL, 0, playSoundThread, (LPVOID)&coinCollect, 0, NULL);
+    if (hThread != NULL) {
+        CloseHandle(hThread); // Release handle, thread continues
+    }
+    
     trackStats.coinCollected();
 }
 
