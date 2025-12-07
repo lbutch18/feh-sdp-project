@@ -8,6 +8,7 @@
 
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
+#define DIFFICULTY 1.35 // Changing this affects how fast cars/buses move relative to road/coins
 int PIXELS_PER_FRAME = 3;
 
 FEHSound collision("8-bit-explosion-10-340462.wav");
@@ -395,7 +396,7 @@ class Car {
     }
     void updatePosition(){
         // Move car left across the screen
-        x_pos -= PIXELS_PER_FRAME;
+        x_pos -= PIXELS_PER_FRAME * DIFFICULTY;
     }
     // Redraw car each frame
     void draw(){
@@ -433,7 +434,7 @@ class Bus {
 
     void updatePosition(){
         // Move bus left across the screen
-        x_pos -= PIXELS_PER_FRAME;
+        x_pos -= PIXELS_PER_FRAME * DIFFICULTY;
     }
     // Redraw bus each frame
     void draw(){
@@ -785,7 +786,7 @@ void nextGameFrame(bool reset){
     // Handle random generation of obstacles/coins
     // Every time a row of objects moves a car's width, generate new row
     // I don't like C :( - why can't I use the dot operator with static variables?
-    if ((frameCount % (Car::CAR_WIDTH / PIXELS_PER_FRAME)) == 0) {
+    if ((frameCount % (int)(Car::CAR_WIDTH / (PIXELS_PER_FRAME*DIFFICULTY))) == 0) {
         generateNewRow(&coins, &cars, &buses);
     }
 
