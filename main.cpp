@@ -11,11 +11,11 @@
 #define DIFFICULTY 1.35 // Changing this affects how fast cars/buses move relative to road/coins
 int PIXELS_PER_FRAME = 3;
 
-FEHSound collision("8-bit-explosion-10-340462.wav");
-FEHSound coinCollect("retro-coin-4-236671.wav");
-FEHSound menuMusic("menu-music.wav");
-FEHSound gameMusic("game-music.wav");
-FEHSound farMusic("far-music.wav");
+FEHSound collision("assets/8-bit-explosion-10-340462.wav");
+FEHSound coinCollect("assets/retro-coin-4-236671.wav");
+FEHSound menuMusic("assets/menu-music.wav");
+FEHSound gameMusic("assets/game-music.wav");
+FEHSound farMusic("assets/far-music.wav");
 
 
 //Functions Prototypes
@@ -250,7 +250,7 @@ class Player {
         }
 
         for (int i = 0; i < 8; i++){
-            frames[i].Open(("player_run_frame_" + std::to_string(i + 1) + ".png").c_str()); // Open each frame
+            frames[i].Open(("assets/player_run_frame_" + std::to_string(i + 1) + ".png").c_str()); // Open each frame
         }
     }
     //X Position will be top left corner of picture to draw;
@@ -332,10 +332,10 @@ class Coin {
         x_pos = SCREEN_WIDTH + COIN_RADIUS*2; // Start at right of screen
         frameCount = 0;
 
-        coin1.Open("coin1.png");
-        coin2.Open("coin2.png");
-        coin3.Open("coin3.png");
-        coin4.Open("coin4.png");
+        coin1.Open("assets/coin1.png");
+        coin2.Open("assets/coin2.png");
+        coin3.Open("assets/coin3.png");
+        coin4.Open("assets/coin4.png");
     }
     void updatePosition(){
         // Move coin left across the screen
@@ -384,13 +384,13 @@ class scrollImage
     {
         if(top)
         {
-            image.Open("topSideWalk.png");
+            image.Open("assets/topSideWalk.png");
             x_pos = x;
             y_pos = 0;
         }
         else
         {
-            image.Open("bottomSidewalk.png");
+            image.Open("assets/bottomSidewalk.png");
             x_pos = x;
             y_pos = 192;
         }
@@ -442,7 +442,7 @@ class Car {
         }
         x_pos = SCREEN_WIDTH;
 
-        carSprite.Open("Car.png");
+        carSprite.Open("assets/Car.png");
     }
     void updatePosition(){
         // Move car left across the screen
@@ -485,7 +485,7 @@ class Bus {
         }
         x_pos = SCREEN_WIDTH;
 
-        busSprite.Open("Bus.png");
+        busSprite.Open("assets/Bus.png");
     }
 
     void updatePosition(){
@@ -527,7 +527,7 @@ void drawMenu() {
     int boxWidth = SCREEN_WIDTH / 1.5;
     int boxHeight = SCREEN_HEIGHT / 8;
     FEHImage menu;
-    menu.Open("Menu Screen.png");
+    menu.Open("assets/Menu Screen.png");
     menu.Draw(0,0);
     
     LCD.SetFontColor(BLACK);
@@ -674,7 +674,7 @@ void introScreen()
     LCD.Clear();
 
     FEHImage introI;
-    introI.Open("introInstructionsUpdated.png");
+    introI.Open("assets/introInstructionsUpdated.png");
     introI.Draw(0,0);
     bool end = false;
 
@@ -710,7 +710,7 @@ void introScreen()
         float dummyy = 0;
         Sleep(300);
         FEHImage first;
-        first.Open("Evil Money Guy Updated2.png");
+        first.Open("assets/Evil Money Guy Updated2.png");
         first.Draw(0,0);
         int start1 = TimeNow();
         while(TimeNow() - start1 < 5 && !space && !any && !LCD.Touch(&dummyx, &dummyy))
@@ -737,7 +737,7 @@ void introScreen()
 
         Sleep(300);
         FEHImage second;
-        second.Open("Planning Guy Updated.png");
+        second.Open("assets/Planning Guy Updated.png");
         second.Draw(0,0);
         int start2 = TimeNow();
         while(TimeNow() - start2 < 5 && !space && !any && !LCD.Touch(&dummyx, &dummyy))
@@ -762,7 +762,7 @@ void introScreen()
         
         LCD.SetFontColor(BLACK);
         FEHImage third;
-        third.Open("Heist Happening Updated 1.png");
+        third.Open("assets/Heist Happening Updated 1.png");
         third.Draw(0,0);
         int start3 = TimeNow();
         while(TimeNow() - start3 < 5 && !space && !any && !LCD.Touch(&dummyx, &dummyy))
@@ -785,7 +785,7 @@ void introScreen()
         any = false;
         Sleep(300);
         FEHImage fourth;
-        fourth.Open("Final Intro Screen Updated.png");
+        fourth.Open("assets/Final Intro Screen Updated.png");
         fourth.Draw(0,0);
         int start4 = TimeNow();
         while(TimeNow() - start4 < 5 && !space && !any && !LCD.Touch(&dummyx, &dummyy))
@@ -1017,7 +1017,7 @@ void drawCollision(int collisionLane){
 
     FEHImage frames[8];
     for (int i = 0; i < 8; i++){
-        frames[i].Open(("crash" + std::to_string(i+1) + ".png").c_str()); //c_str converts to char array
+        frames[i].Open(("assets/crash" + std::to_string(i+1) + ".png").c_str()); //c_str converts to char array
         frames[i].Draw(5, yPos); // is 5 so centered on player
         Sleep(75);
     }
@@ -1130,7 +1130,7 @@ void drawStatistics()
     LCD.Clear();
     
     FEHImage menu;
-    menu.Open("Menu Screen.png");
+    menu.Open("assets/Menu Screen.png");
     menu.Draw(0,0);
     //Print out stats
     LCD.SetFontColor(BLACK);
@@ -1183,7 +1183,7 @@ void drawInstructions()
     LCD.Clear();
     LCD.SetFontScale(0.5);
     FEHImage instructions;
-    instructions.Open("fixed_instructions.png");
+    instructions.Open("assets/fixed_instructions.png");
     instructions.Draw(0,0);
 
     
@@ -1221,7 +1221,7 @@ void drawCredits()
     LCD.Clear();
 
     FEHImage credits;
-    credits.Open("creditScreen.png");
+    credits.Open("assets/creditScreen.png");
     credits.Draw(0,0);
     
     LCD.SetFontScale(1.0);
@@ -1255,7 +1255,7 @@ void endScreen()
 {
     LCD.Clear();
     FEHImage end;
-    end.Open("Menu Screen.png");
+    end.Open("assets/Menu Screen.png");
     end.Draw(0,0);
     LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(10, 40, 300, 220);
