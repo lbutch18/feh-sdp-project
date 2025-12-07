@@ -531,7 +531,7 @@ void animateBetweenButton(float x, float y)
     LCD.SetFontColor(WHITE);
     while (rad < SCREEN_WIDTH){
         LCD.FillCircle(centerX, centerY, rad);
-        rad += 3; // arbitrary
+        rad += 5; // arbitrary
         Sleep(1);
     }
     LCD.SetFontColor(BLACK);
@@ -547,7 +547,7 @@ void drawPlay()
     int rad = 0;
     while (rad < SCREEN_WIDTH){
         LCD.FillCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, rad);
-        rad += 3; // arbitrary
+        rad += 5; // arbitrary
         Sleep(1);
     }
 
