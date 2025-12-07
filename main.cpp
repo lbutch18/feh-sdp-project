@@ -1064,30 +1064,19 @@ Implements game logic to make it so the player has a chance to win
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
     // Track if we need to skip obstacle generation this row
     static int skipObstacleRows = 0;
-    static int lastCoinLane = 2;
-    // Track last bus lane for coin generation
-    static int lastBusLane = 0;
 
     // Always generate a coin
     int coinLane = (Random.RandInt()) / 10923 + 1;
-    while (coinLane == lastBusLane){
-        coinLane = (Random.RandInt()) / 10923 + 1;
-    }
     (*coins).push_back(Coin(coinLane));
-    lastCoinLane = coinLane;
 
     // Check if obstacle generation is skipped
     if (skipObstacleRows > 0) {
         skipObstacleRows--;
-        lastBusLane = 0; // Can reset this because coin can no longer spawn on top of bus
         return;
     }
 
     // Generate an obstacle in a different lane than the coin
     int obstacleLane = (Random.RandInt()) / 10923 + 1;
-    while (obstacleLane == coinLane) {
-        obstacleLane = (Random.RandInt()) / 10923 + 1;
-    }
 
     int obstacleType = (Random.RandInt()) / 16383;
     if (obstacleType == 0) {
@@ -1096,7 +1085,6 @@ void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vecto
     } else {
         (*buses).push_back(Bus(obstacleLane));
         skipObstacleRows = 2; // Bus is wider, skip 2 rows
-        lastBusLane = obstacleLane;
     }
 }
 
