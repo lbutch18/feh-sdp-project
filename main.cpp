@@ -11,6 +11,7 @@
 #define DIFFICULTY 1.35 // Changing this affects how fast cars/buses move relative to road/coins
 int PIXELS_PER_FRAME = 3;
 
+//Sounds
 FEHSound collision("8-bit-explosion-10-340462.wav");
 FEHSound coinCollect("retro-coin-4-236671.wav");
 FEHSound menuMusic("menu-music.wav");
@@ -40,7 +41,6 @@ void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vecto
 void deleteOffScreenObjects(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses);
 void collectCoin(std::vector<Coin> *coins, int coinID);
 
-//Add to website
 /*
 Generative AI was used to create images - more thorough accreditation can be found on our website
 */
@@ -71,6 +71,7 @@ class StatTracker {
             coins = 0;
             score = 0;
         }
+        //Get functions for instance variables
         void updateDistance(){
             distance++;
             updateScore();
@@ -253,7 +254,8 @@ class Player {
             frames[i].Open(("player_run_frame_" + std::to_string(i + 1) + ".png").c_str()); // Open each frame
         }
     }
-    //X Position will be top left corner of picture to draw;
+    //X Position will be top left corner of picture to draw
+    //Functions to allow player movement throughout lanes
     void moveUp()
     {
         if(lane == 2)
@@ -530,6 +532,7 @@ void drawMenu() {
     menu.Open("Menu Screen.png");
     menu.Draw(0,0);
     
+    //Button creation
     LCD.SetFontColor(BLACK);
     LCD.DrawRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 50, boxWidth, boxHeight); // Play Button
     LCD.FillRectangle(SCREEN_WIDTH / 2 - boxWidth / 2, 50, boxWidth, boxHeight);\
@@ -556,6 +559,7 @@ void drawMenu() {
     float x_pos, y_pos, x_dummy, y_dummy;
     bool boxTouched = false;
 
+    //Responses to button press
     while (!boxTouched){
         while (!LCD.Touch(&x_pos, &y_pos));
         while (LCD.Touch(&x_dummy, &y_dummy));
@@ -814,7 +818,7 @@ void introScreen()
 Audrey Malcuit and Luke Butcher
 Redraws screen every frame (background, obstacles, player, updates score, time, and coins, and checks for collisions
 Input of reset boolean: if true, reset all objects
-Finish this
+Continually get user input and respond to that
 */
 void nextGameFrame(bool reset){
     // All objects should be declared static so their locations/states are maintained
@@ -1039,7 +1043,7 @@ DWORD WINAPI playSoundThread(LPVOID soundptr) {
 /*
 Luke Butcher
 Handles the visual for coin disappearing upon collection, updates the number of coins collected, plays a sound
-Parameters: vector of coins and 
+Parameters: vector of coins and FINISH THIS
 */
 void collectCoin(std::vector<Coin> *coins, int coinID){
     (*coins).erase((*coins).begin() + coinID);
@@ -1216,7 +1220,6 @@ void drawInstructions()
 Audrey Malcuit
 Draws credits image and allows user to go back to menu screen
 */
-
 void drawCredits()
 {
     LCD.Clear();
