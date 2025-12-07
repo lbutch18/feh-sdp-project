@@ -1034,7 +1034,7 @@ Sound bite during play
 */
 DWORD WINAPI playSoundThread(LPVOID soundptr) {
     FEHSound* sound = static_cast<FEHSound*>(soundptr);
-    sound->play();
+    (*sound).play();
     return 0;
 }
 
