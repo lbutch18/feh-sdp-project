@@ -5,7 +5,7 @@
 #include <FEHRandom.h>
 #include <FEHSound.h>
 #include <windows.h>
-
+//Constants
 #define SCREEN_WIDTH 319
 #define SCREEN_HEIGHT 239
 #define DIFFICULTY 1.35 // Changing this affects how fast cars/buses move relative to road/coins
@@ -18,6 +18,7 @@ FEHSound gameMusic("game-music.wav");
 FEHSound farMusic("far-music.wav");
 
 
+//Functions Prototypes
 void drawMenu();
 void drawPlay();
 void drawStatistics();
@@ -39,6 +40,17 @@ void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vecto
 void deleteOffScreenObjects(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses);
 void collectCoin(std::vector<Coin> *coins, int coinID);
 
+//Add to website
+/*
+Generative AI was used to create images - more thorough accreditation can be found on our website
+*/
+
+/*
+Luke Butcher and Audrey Malcuit
+Class to track statistics throughout game for end screen and also keep track of max stats for statistics
+Variables for max and each run values for: score, distance, coins, and time
+Functions to access instance variables (some return pointers to update them, mainly max), draw score on screen, and reset stats between games 
+*/
 class StatTracker {
     private:
         int distance;
@@ -109,6 +121,9 @@ class StatTracker {
         
 };
 
+/*
+Audrey Malcuit: takes in current run distance and max and compares it to max to see if max distance should be updated
+*/
 static void updateMaxDistance(int d, int* max)
 {
     if(d > *(max))
@@ -117,6 +132,9 @@ static void updateMaxDistance(int d, int* max)
     }
           
 }
+/*
+Audrey Malcuit: takes in current run coins and max and compares it to max to see if max coins should be updated
+*/
 static void updateMaxCoins(int c, int* max)
 {
     if(c > *(max))
@@ -125,6 +143,9 @@ static void updateMaxCoins(int c, int* max)
     }
           
 }
+/*
+Audrey Malcuit: takes in current run score and max and compares it to max to see if max score should be updated
+*/
 static void updateMaxScore(int s, int* max)
 {
     if(s > *(max))
@@ -133,6 +154,9 @@ static void updateMaxScore(int s, int* max)
     }
           
 }
+/*
+Audrey Malcuit: takes in current run time and max and compares it to max to see if max time should be updated
+*/
 static void updateMaxTime(int t, int* max)
 {
     if(t > *(max))
@@ -145,6 +169,12 @@ static void updateMaxTime(int t, int* max)
 //Instantiate this class globally
 StatTracker trackStats = StatTracker();
 
+/*
+Luke Butcher
+Allows for dotted lines to be drawn to simulate lanes
+Array of lines for each lane - initialized with respective y positions for each lane
+Solid lines on outside, dashed for interior lanes, progresses lanes during game
+*/
 class LanesDrawer{
     private:
         int laneXPositions[6];
@@ -184,6 +214,12 @@ class LanesDrawer{
         }
 };
 
+/*
+Audrey Malcuit and Luke Butcher
+Create player with input of lane - sets up x and y coordinates and draws player
+Functions to moveUp and moveDown in response to user keyboard input
+Draw function and get function for lane
+*/
 class Player {
     private:
         int lane;
@@ -218,7 +254,6 @@ class Player {
         }
     }
     //X Position will be top left corner of picture to draw;
-    // Would be cool if we can make these smooth
     void moveUp()
     {
         if(lane == 2)
@@ -264,6 +299,11 @@ class Player {
     }
 };
 
+/*
+Luke Butcher
+Creates coins and sets their dimensions and positions according to lane
+Functions to update the position of the coins, draw the coins, and get functions for the x position and the lane
+*/
 class Coin {
     private:
         int lane = 1; // Default lane
@@ -323,6 +363,12 @@ class Coin {
     }
 };
 
+/*
+Audrey Malcuit
+Creation of top and bottom scrolling cityscapes throughout game to simulate moving forward
+Boolean true for top, false for bottom - x position changes throughout and is updated throughout, y coordinates stay constant
+Get function for x coordinate and draw function 
+*/
 class scrollImage
 {
     private:
@@ -330,10 +376,9 @@ class scrollImage
         FEHImage image;
         int x_pos, y_pos;
     public:
-    //Will have to create starting images with x as input
     scrollImage()
     {
-
+        
     }
     scrollImage(boolean top, int x)
     {
@@ -371,7 +416,12 @@ class scrollImage
 };
 
 
-
+/*
+Luke Butcher
+Creates car with lane, x position, y position, and image
+Update function to update position throughout the game and draw function to redraw every frame
+Get functions for x and y to be able to check those coordinates for collisions
+*/
 class Car {
     private:
         int lane;
@@ -410,6 +460,12 @@ class Car {
     }
 };
 
+/*
+Luke Butcher
+Creates bus with lane, x position, y position, and image
+Update function to update position throughout the game and draw function to redraw every frame
+Get functions for x and y to be able to check those coordinates for collisions
+*/
 class Bus {
     private:
         int lane;
@@ -448,14 +504,19 @@ class Bus {
     }
 };
 
+//Main function to run program
 int main()
 {
     // Don't print warnings
     freopen("/dev/null", "w", stdout);
 
-    drawMenu();
+    drawMenu(); // Draw beginning menu screen
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Shows beginning screen with background and button boxes - game will respond to user button input and change screens
+*/
 void drawMenu() {
     menuMusic.setVolume(0.5);
     menuMusic.play();
@@ -522,6 +583,10 @@ void drawMenu() {
     }
 }
 
+/*
+Audrey Malcuit
+Have a white circle get bigger and bigger across the screen, starting where the user touched, as a transition
+*/
 void animateBetweenButton(float x, float y)
 {
     
@@ -537,6 +602,10 @@ void animateBetweenButton(float x, float y)
     LCD.SetFontColor(BLACK);
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Calls the intro screen function with story line, updates start time for stats, runs until end of game or user presses back arrow
+*/
 void drawPlay()
 {
     LCD.Clear();
@@ -558,7 +627,7 @@ void drawPlay()
     int frameCount = 0; // Need to keep track of frame count to determine when to speed up
     PIXELS_PER_FRAME = 3;
     int* startTime = trackStats.getstartTime();
-    *(startTime) = TimeNow();
+    *(startTime) = TimeNow(); //Reset start time for each run
     
     gameMusic.setVolume(0.5);
     menuMusic.pause();
@@ -587,7 +656,7 @@ void drawPlay()
             }
         }
         
-        if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){
+        if(x_pos > 5  && x_pos < 25  && y_pos > 5  && y_pos < 25){ //Back arrow coordinates
             exit = true;
         }
     }
@@ -595,7 +664,11 @@ void drawPlay()
     drawMenu();
 }
 
-
+/*
+Audrey Malcuit
+Cycle through AI-generated image screens as an intro storyline
+Gives user option to skip storyline together at any time with pressing space bar or moving quicker through the storyline by pressing any other key
+*/
 void introScreen()
 {
     LCD.Clear();
@@ -605,6 +678,12 @@ void introScreen()
     introI.Draw(0,0);
     bool end = false;
 
+    /*
+    This code is largely the same for the next pictures
+    Get start time - max time on screen without user input is 5 seconds
+    Respond to keyboard press or touch on screen
+    Check for space first, and if so break out of inner loop and outer loop
+    */
     int introTime = TimeNow();
     float dummyx = 0;
     float dummyy = 0;
@@ -621,9 +700,9 @@ void introScreen()
             any = true;
         }
     }
-    any = false;
+    any = false; //reset throughout for next while loop condition
 
-    while(!Keyboard.isPressed(KEY_SPACE) && !end && !space)
+    while(!Keyboard.isPressed(KEY_SPACE) && !end && !space) //end condition so that it only shows storyline once
     {
 
         
@@ -731,6 +810,12 @@ void introScreen()
 
 }
 
+/*
+Audrey Malcuit and Luke Butcher
+Redraws screen every frame (background, obstacles, player, updates score, time, and coins, and checks for collisions
+Input of reset boolean: if true, reset all objects
+Finish this
+*/
 void nextGameFrame(bool reset){
     // All objects should be declared static so their locations/states are maintained
     // Reminder, the object constructors take in lane number (1 = left, 2 = center, 3 = right)
@@ -744,14 +829,15 @@ void nextGameFrame(bool reset){
 
     static Player player(2);
 
+    //Images to scroll at top and bottom
     static scrollImage top1;
     static scrollImage top2;
     static scrollImage bottom1;
     static scrollImage bottom2;
     int temp = 25;
-    int i = 0;
     int startTime = 0;
-    int* start = trackStats.getstartTime();
+    int* start = trackStats.getstartTime(); // Get the start time to calculate time throughout game
+    //Initialize images at the start of the game
     if (frameCount == 0){
         top1 = scrollImage(true, 0);
         top2 = scrollImage(true, SCREEN_WIDTH);
@@ -785,7 +871,6 @@ void nextGameFrame(bool reset){
 
     // Handle random generation of obstacles/coins
     // Every time a row of objects moves a car's width, generate new row
-    // I don't like C :( - why can't I use the dot operator with static variables?
     if ((frameCount % (int)(Car::CAR_WIDTH / (PIXELS_PER_FRAME*DIFFICULTY))) == 0) {
         generateNewRow(&coins, &cars, &buses);
     }
@@ -805,16 +890,18 @@ void nextGameFrame(bool reset){
         buses[i].updatePosition();
     }
    
-
+    //Update scrolling images' position
     top1.updatePosition();
     top2.updatePosition();
     bottom1.updatePosition();
     bottom2.updatePosition();
 
+    //Draw scrolling images
     bottom1.draw();
     bottom2.draw();
     top1.draw();
     top2.draw();
+
     // Add to distance every frame
     trackStats.updateDistance();
     
@@ -823,6 +910,7 @@ void nextGameFrame(bool reset){
     static bool wasUpPressed = false;
     static bool wasDownPressed = false;
     
+    //Get user input, respond with up or down movement
     bool isUpPressed = Keyboard.isPressed(KEY_LEFT) || Keyboard.isPressed(KEY_UP);
     bool isDownPressed = Keyboard.isPressed(KEY_RIGHT) || Keyboard.isPressed(KEY_DOWN);
     
@@ -913,7 +1001,10 @@ void nextGameFrame(bool reset){
     *(tempTime) = TimeNow() - *(trackStats.getstartTime());
 }
 
-// Handle collision animations
+/*
+Luke Butcher
+According to the lane where the collision occurred (parameter), a collision animation is drawn
+ */
 void drawCollision(int collisionLane){
     collision.play();
 
@@ -934,12 +1025,21 @@ void drawCollision(int collisionLane){
 
 
 // Need to use threading because .play() isn't fully async
+/*
+Luke Butcher
+Sound bite during play
+*/
 DWORD WINAPI playSoundThread(LPVOID soundptr) {
     FEHSound* sound = static_cast<FEHSound*>(soundptr);
     sound->play();
     return 0;
 }
 
+/*
+Luke Butcher
+Handles the visual for coin disappearing upon collection, updates the number of coins collected, plays a sound
+Parameters: vector of coins and 
+*/
 void collectCoin(std::vector<Coin> *coins, int coinID){
     (*coins).erase((*coins).begin() + coinID);
     
@@ -952,6 +1052,11 @@ void collectCoin(std::vector<Coin> *coins, int coinID){
     trackStats.coinCollected();
 }
 
+/*
+Luke Butcher
+Create a new rows of obstacles (car, bus, or coin)
+Implements game logic to make it so the player has a chance to win
+*/
 void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
     // Track if we need to skip obstacle generation this row
     static int skipObstacleRows = 0;
@@ -991,6 +1096,10 @@ void generateNewRow(std::vector<Coin> *coins, std::vector<Car> *cars, std::vecto
     }
 }
 
+/*
+Luke Butcher 
+Makes sure objects being drawn off screen does not affect gameplay or cause the program to lag - delete before they can go off screen
+*/
 void deleteOffScreenObjects(std::vector<Coin> *coins, std::vector<Car> *cars, std::vector<Bus> *buses){
     
     for (int i = (*coins).size() - 1; i >= 0; i--) {
@@ -1010,6 +1119,12 @@ void deleteOffScreenObjects(std::vector<Coin> *coins, std::vector<Car> *cars, st
     }
 }
 
+
+/*
+Audrey Malcuit
+Draw background and display best run stats
+Allows for option to go back to home screen
+*/
 void drawStatistics()
 {
     LCD.Clear();
@@ -1023,7 +1138,7 @@ void drawStatistics()
     LCD.FillRectangle(10, 40, 300, 220);
     LCD.SetFontColor(WHITE);
 
-    
+    //Get best run stats from trackStats class and dereference the pointers
     LCD.WriteAt("Best Run", 20, 50);
     LCD.SetFontScale(0.75);
     std::string coins = "Coins Collected: ";
@@ -1058,6 +1173,11 @@ void drawStatistics()
     drawMenu();
 }
 
+/*
+Audrey Malcuit
+Draws pictures that contains the instructions for the game
+Allows for user to select back button to navigate back to home screen
+*/
 void drawInstructions()
 {
     LCD.Clear();
@@ -1091,27 +1211,21 @@ void drawInstructions()
     
 }
 
+/*
+Audrey Malcuit
+Draws credits image and allows user to go back to menu screen
+*/
+
 void drawCredits()
 {
     LCD.Clear();
-    //Fix this - tested intro screens
-    
-    //LCD.SetFontScale(0.5);
-    
-    
-     
 
     FEHImage credits;
     credits.Open("creditScreen.png");
     credits.Draw(0,0);
     
-
-    
-      
     LCD.SetFontScale(1.0);
-    
-    
- 
+
     LCD.SetFontColor(WHITE);  
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
@@ -1133,7 +1247,10 @@ void drawCredits()
 
 
 
-
+/*
+Audrey Malcuit and Luke Butcher
+Displays the ending stats for the game and checks max stats to see if those should be updated
+*/
 void endScreen()
 {
     LCD.Clear();
@@ -1146,6 +1263,8 @@ void endScreen()
     LCD.SetFontColor(WHITE);
     LCD.WriteAt("Game Over!", 20, 50);
     // use c++ string fxns b/c they're better
+
+    //Display stats
     std::string coins = "Coins Collected: ";
     coins.append(std::to_string(trackStats.getCoins()));
     LCD.WriteAt(coins, 20, 80);
@@ -1155,11 +1274,13 @@ void endScreen()
     LCD.WriteAt(time, 20, 140);
     LCD.WriteAt("Final score: " + std::to_string(trackStats.getScore()), 20, 170);
     
+    //Check to see if maxes should be changed - changed if the current run had a greater stat
     updateMaxTime(*(trackStats.getTime()), trackStats.getMaxTime());
     updateMaxDistance(trackStats.getDistance(), trackStats.getMaxDistance());
     updateMaxScore(trackStats.getScore(), trackStats.getMaxScore());
     updateMaxCoins(trackStats.getCoins(), trackStats.getMaxCoins());
 
+    //Back button
     LCD.SetFontColor(WHITE);  
     LCD.DrawRectangle(5, 5, 20, 20);
     LCD.WriteAt("<", 5, 5);
