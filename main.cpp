@@ -186,7 +186,7 @@ class LanesDrawer{
 class Player {
     private:
         int lane;
-        int x_pos, y_pos;
+        int x_pos, y_pos, last_y_pos;
         int SPRITE_W = 35;
         int SPRITE_H = 35;
         int frameCount;
@@ -199,14 +199,17 @@ class Player {
         if (inputLane == 1){
             lane = 1;
             y_pos = 54;
+            last_y_pos = y_pos;
         }
         else if (inputLane == 2){
             lane = 2;
             y_pos =  102;
+            last_y_pos = y_pos;
         } 
         else if(inputLane == 3){
             lane = 3;
             y_pos = 150;
+            last_y_pos = y_pos;
         }
 
         for (int i = 0; i < 8; i++){
@@ -243,7 +246,13 @@ class Player {
     }
     // Redraw player each frame
     void draw() {
-        frames[frameCount].Draw(x_pos, y_pos);
+        // Make it smooth easiest way i could think of
+        if (last_y_pos < y_pos){
+            last_y_pos += 12;
+        }else if (last_y_pos > y_pos){
+            last_y_pos -= 12;
+        }
+        frames[frameCount].Draw(x_pos, last_y_pos);
         frameCount++;
         if (frameCount >= 8){
             frameCount = 0; // reset frame count
