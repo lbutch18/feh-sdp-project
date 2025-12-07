@@ -1143,7 +1143,7 @@ void drawStatistics()
 
     //Get best run stats from trackStats class and dereference the pointers
     LCD.WriteAt("Best Run", 20, 50);
-    LCD.SetFontScale(0.75);
+    LCD.SetFontScale(0.5);
     std::string coins = "Coins Collected: ";
     coins.append(std::to_string(*(trackStats.getMaxCoins())));
     LCD.WriteAt(coins, 20, 80);
