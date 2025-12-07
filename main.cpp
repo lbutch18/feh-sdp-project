@@ -248,9 +248,9 @@ class Player {
     void draw() {
         // Make it smooth easiest way i could think of
         if (last_y_pos < y_pos){
-            last_y_pos += 12;
+            last_y_pos += 16; // If we change this make sure it's a factor of 48 otherwise it'l break (gap dist)
         }else if (last_y_pos > y_pos){
-            last_y_pos -= 12;
+            last_y_pos -= 16;
         }
         frames[frameCount].Draw(x_pos, last_y_pos);
         frameCount++;
