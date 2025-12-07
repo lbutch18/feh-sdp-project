@@ -868,6 +868,7 @@ void nextGameFrame(bool reset){
 
     // Easter egg music if you go far enough
     if (frameCount == 2095){
+        gameMusic.pause();
         farMusic.setVolume(0.5);
         farMusic.play();
     }
