@@ -627,7 +627,7 @@ void drawPlay()
     float x_pos, y_pos, x_dummy, y_dummy;
     bool exit = false;
     bool reset = true; // To reset game state on first frame after entering from menu
-    int FRAME_RATE = 6; // Set frame redraw time to 10 ms
+    int FRAME_RATE = 20; // Set frame redraw time to 10 ms
     int frameCount = 0; // Need to keep track of frame count to determine when to speed up
     PIXELS_PER_FRAME = 3;
     int* startTime = trackStats.getstartTime();
@@ -871,11 +871,11 @@ void nextGameFrame(bool reset){
     if (frameCount == 2095){
         farMusic.setVolume(0.5);
         farMusic.play();
+        farMusic.play();
     }
 
     // Handle random generation of obstacles/coins
     // Every time a row of objects moves a car's width, generate new row
-<<<<<<<<< Temporary merge branch 1
     // I don't like C :( - why can't I use the dot operator with static variables?
     if ((frameCount % (int)(Car::CAR_WIDTH / (PIXELS_PER_FRAME*DIFFICULTY))) == 0) {
         generateNewRow(&coins, &cars, &buses);
